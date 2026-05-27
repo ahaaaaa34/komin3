@@ -1,0 +1,25 @@
+{
+  "name": "公共と人 — 穴埋めクイズ",
+  "short_name": "公共クイズ",
+  "description": "公民教科書第1章「公共と人」の穴埋めクイズPWAアプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#7c6ffa",
+  "orientation": "any",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

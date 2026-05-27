@@ -1,0 +1,363 @@
+/* ============================================================
+   公民クイズ — しっぽり明朝 × モノクローム
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #f8f7f4;
+  --surface:  #ffffff;
+  --surface2: #f0ede8;
+  --border:   #c8c5bc;
+  --borderdk: #1a1a1a;
+  --text:     #1a1a1a;
+  --text2:    #4a4a48;
+  --text3:    #9a9a98;
+  --blank-bg: #e2e0d8;
+  --hdr-h:    52px;
+  --font: 'Shippori Mincho', 'Yu Mincho', 'YuMincho', serif;
+}
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+}
+
+/* ── ヘッダー ─────────────────────────────── */
+#app-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--hdr-h);
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--borderdk);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+  z-index: 100;
+}
+
+#header-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+
+/* モードタブ（文のみ / 全文） */
+.tab-group {
+  display: flex;
+  border: 1.5px solid var(--borderdk);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.tab-btn {
+  background: var(--surface);
+  border: none;
+  border-right: 1.5px solid var(--borderdk);
+  padding: 5px 13px;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  color: var(--text2);
+  transition: background .12s, color .12s;
+  white-space: nowrap;
+}
+.tab-btn:last-child { border-right: none; }
+.tab-btn:hover { background: var(--surface2); color: var(--text); }
+.tab-btn.active { background: var(--borderdk); color: #fff; }
+
+/* 凡例 */
+#legend {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#legend .lbl-blank   { display:inline-block; width:2em; height:1em; background:var(--blank-bg); border-bottom:1.5px solid var(--borderdk); vertical-align:middle; }
+#legend .lbl-correct { display:inline-block; width:2em; height:1em; border-bottom:2px solid var(--borderdk); vertical-align:middle; }
+#legend .lbl-wrong   { display:inline-block; width:2em; height:1em; border-bottom:1.5px dashed var(--borderdk); text-decoration:line-through; font-size:10px; vertical-align:middle; }
+
+#header-score {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 復習・リセットボタン共通 */
+#review-btn,
+#reset-btn {
+  padding: 5px 12px;
+  border: 1.5px solid var(--borderdk);
+  border-radius: 2px;
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  color: var(--text);
+  transition: background .12s, color .12s, border-color .12s;
+  flex-shrink: 0;
+}
+#review-btn:hover:not(:disabled),
+#reset-btn:hover { background: var(--surface2); }
+
+/* 復習ボタン — 無効時 */
+#review-btn:disabled {
+  color: var(--text3);
+  border-color: var(--border);
+  cursor: default;
+}
+/* 復習ボタン — 復習モード中（アクティブ） */
+#review-btn.active {
+  background: var(--borderdk);
+  color: #fff;
+  border-color: var(--borderdk);
+}
+
+/* ── メイン ──────────────────────────────── */
+#main {
+  height: 100vh;
+  padding-top: var(--hdr-h);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+#content {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 32px 28px 80px;
+}
+
+/* ── セクションヘッダー ────────────────────── */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 32px 0 10px;
+}
+.sec-header:first-child { margin-top: 0; }
+
+.sec-page {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+/* ── 問題文 ─────────────────────────────── */
+.q-row {
+  display: block;
+  font-size: 14.5px;
+  line-height: 2.1;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+/* ── 全文モード見出し ──────────────────────── */
+.ft-h2 {
+  font-size: 17px;
+  font-weight: 700;
+  border-bottom: 1.5px solid var(--borderdk);
+  padding-bottom: 6px;
+  margin: 28px 0 10px;
+}
+.ft-h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 20px 0 6px;
+}
+.ft-p {
+  font-size: 14.5px;
+  line-height: 2.1;
+  text-align: justify;
+  margin-bottom: 10px;
+}
+.ft-page {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin: 20px 0 8px;
+}
+
+/* ── 空白要素（クリックインタラクション） ─────── */
+.blank {
+  display: inline-block;
+  background: var(--blank-bg);
+  border-bottom: 1.5px solid var(--borderdk);
+  min-width: 2.5em;
+  padding: 0 4px;
+  cursor: pointer;
+  vertical-align: baseline;
+  font-size: inherit;
+  line-height: inherit;
+
+  /* テキスト非表示（状態0） */
+  color: transparent;
+  user-select: none;
+
+  transition: background .15s, color .15s, border-color .15s, opacity .15s;
+  border-radius: 1px;
+}
+
+.blank:hover {
+  background: #d0cdc4;
+  opacity: .85;
+}
+
+/* 状態1: 正解（1回目クリック） */
+.blank.s1 {
+  background: transparent;
+  color: var(--text);
+  border-bottom: 2px solid var(--borderdk);
+  cursor: pointer; /* もう一度クリックで不正解 */
+}
+.blank.s1:hover {
+  opacity: .7;
+}
+
+/* 状態2: 不正解（2回目クリック） */
+.blank.s2 {
+  background: transparent;
+  color: var(--text3);
+  border-bottom: 1.5px dashed var(--border);
+  text-decoration: line-through;
+  cursor: pointer; /* クリックでリセット */
+}
+.blank.s2:hover {
+  opacity: .7;
+}
+
+/* ── 完了カード ──────────────────────────── */
+#complete-card {
+  margin: 48px 0 0;
+  padding: 40px 32px 36px;
+  border: 1.5px solid var(--borderdk);
+  border-radius: 2px;
+  text-align: center;
+  background: var(--surface);
+}
+
+#cmp-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--text3);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+#cmp-stats {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-bottom: 10px;
+}
+
+#cmp-correct {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+#cmp-wrong {
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--text3);
+}
+
+#cmp-pct {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 32px;
+  color: var(--text);
+}
+
+#cmp-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#cmp-review-btn,
+#cmp-reset-btn {
+  padding: 8px 22px;
+  border: 1.5px solid var(--borderdk);
+  border-radius: 2px;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity .12s, background .12s;
+}
+
+#cmp-review-btn {
+  background: var(--borderdk);
+  color: #fff;
+}
+#cmp-review-btn:hover { opacity: .8; }
+
+#cmp-reset-btn {
+  background: var(--surface);
+  color: var(--text);
+}
+#cmp-reset-btn:hover { background: var(--surface2); }
+
+/* ── スコアバー ──────────────────────────── */
+#score-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--blank-bg);
+  z-index: 99;
+}
+#score-bar-fill {
+  height: 100%;
+  background: var(--borderdk);
+  transition: width .3s;
+  width: 0%;
+}
+
+/* ── スクロールバー ──────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── モバイル ────────────────────────────── */
+@media (max-width: 600px) {
+  #content { padding: 20px 14px 60px; }
+  #legend { display: none; }
+  #app-header { gap: 8px; padding: 0 12px; }
+}

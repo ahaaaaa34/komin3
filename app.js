@@ -1,18 +1,16 @@
-// app.js — 公民クイズ メインロジック（クリック方式）
+// app.js — 家庭基礎クイズ（クリック方式 + 記入方式）
 import quizData from './data.js';
 import { fullTextData } from './fulltext.js';
+import { sectionSVGs } from './icons.js';
 
 // ══════════════════════════════════════════════════════════════
 //  状態
 // ══════════════════════════════════════════════════════════════
-let textMode   = 'quiz'; // 'quiz' | 'full'
-let reviewMode = false;  // 不正解のみ再出題モード
-const reviewSet = new Set(); // reviewMode中に表示するqi
+let textMode   = 'quiz'; // 'quiz' | 'type' | 'full'
+let reviewMode = false;
+const reviewSet = new Set();
 
 // 各空白の状態: Map('${qi}-${bi}' → 0|1|2)
-// 0 = 未解答（非表示）
-// 1 = 正解（1回目クリック・答え表示）
-// 2 = 不正解（2回目クリック）
 const blankStates = new Map();
 
 // ── ヘルパー ──────────────────────────────────────────────────
@@ -20,19 +18,24 @@ const blankStates = new Map();
 function bKey(qi, bi) { return `${qi}-${bi}`; }
 function getState(qi, bi) { return blankStates.get(bKey(qi, bi)) ?? 0; }
 
-/** quizData[qi] の bi番目の空白テキストを返す */
 function getBlankText(qi, bi) {
   const blanks = (quizData[qi]?.segs ?? []).filter(s => s.b !== undefined);
   return blanks[bi]?.b ?? '?';
 }
 
-/** 全空白数 */
 const totalBlanks = quizData.reduce(
   (n, item) => n + item.segs.filter(s => s.b !== undefined).length, 0
 );
 
+// 全角→半角正規化（答え合わせ用）
+function normalize(s) {
+  return s.trim()
+    .replace(/[！-～]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/　/g, ' ');
+}
+
 // ══════════════════════════════════════════════════════════════
-//  空白要素の生成・状態更新
+//  クリックモード用: 空白要素
 // ══════════════════════════════════════════════════════════════
 
 function applyBlankState(el) {
@@ -40,18 +43,14 @@ function applyBlankState(el) {
   const bi = +el.dataset.bi;
   const s  = getState(qi, bi);
   el.className = `blank s${s}`;
-  el.title = [
-    'クリックで答えを表示（正解）',
-    'もう一度クリックで不正解',
-    'クリックでリセット'
-  ][s];
+  el.title = ['クリックで答えを表示（正解）','もう一度クリックで不正解','クリックでリセット'][s];
 }
 
 function makeBlank(qi, bi, ansText) {
   const el = document.createElement('span');
   el.dataset.qi = qi;
   el.dataset.bi = bi;
-  el.textContent = ansText; // 常にセット（colorで表示/非表示を制御）
+  el.textContent = ansText;
   el.addEventListener('click', onBlankClick);
   applyBlankState(el);
   return el;
@@ -62,10 +61,70 @@ function onBlankClick(e) {
   const qi = +el.dataset.qi;
   const bi = +el.dataset.bi;
   const s  = getState(qi, bi);
-  // 0 → 1 → 2 → 0 でサイクル
   const next = s === 0 ? 1 : s === 1 ? 2 : 0;
   blankStates.set(bKey(qi, bi), next);
   applyBlankState(el);
+  updateScore();
+  updateReviewBtn();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  記入モード用: 入力欄
+// ══════════════════════════════════════════════════════════════
+
+function makeTypeInput(qi, bi, ansText) {
+  const el = document.createElement('input');
+  el.type = 'text';
+  el.dataset.qi  = qi;
+  el.dataset.bi  = bi;
+  el.dataset.ans = ansText;
+  el.className   = 'blank-input';
+  // 答えの文字数に合わせて幅を設定（日本語は約1em/文字）
+  el.style.width = `${Math.max(ansText.length * 1.2 + 0.6, 3)}em`;
+  el.setAttribute('autocomplete',   'off');
+  el.setAttribute('autocorrect',    'off');
+  el.setAttribute('autocapitalize', 'none');
+  el.setAttribute('spellcheck',     'false');
+  el.setAttribute('enterkeyhint',   'next');
+
+  // IME入力中はEnterで送信しない
+  let composing = false;
+  el.addEventListener('compositionstart', () => { composing = true; });
+  el.addEventListener('compositionend',   () => { composing = false; });
+
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !composing) {
+      e.preventDefault();
+      submitTypeInput(el);
+    }
+  });
+  return el;
+}
+
+function submitTypeInput(el) {
+  const qi    = +el.dataset.qi;
+  const bi    = +el.dataset.bi;
+  const ans   = el.dataset.ans;
+  const typed = el.value.trim();
+
+  // ① 次の未回答入力欄を先に探す（iOS: フォーカス移動が先でないとキーボードが閉じる）
+  const allInputs = Array.from(document.querySelectorAll('.blank-input:not([readonly])'));
+  const idx       = allInputs.indexOf(el);
+  const nextInp   = allInputs[idx + 1] ?? null;
+
+  // ② 次の入力欄へフォーカスを移す（同期処理: キーボードを閉じさせない）
+  if (nextInp) {
+    nextInp.focus();
+    nextInp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ③ 現在の入力欄を採点・確定（未入力は不正解スキップ）
+  const state = (typed && normalize(typed) === normalize(ans)) ? 1 : 2;
+  blankStates.set(bKey(qi, bi), state);
+  el.value = ans;                      // 正解を表示
+  el.setAttribute('readonly', '');
+  el.className = `blank-input s${state}`;
+
   updateScore();
   updateReviewBtn();
 }
@@ -78,33 +137,47 @@ const content = document.getElementById('content');
 
 function render() {
   content.innerHTML = '';
-  if (textMode === 'quiz') renderQuiz();
-  else renderFull();
+  if      (textMode === 'quiz') renderQuiz();
+  else if (textMode === 'type') renderTypeMode();
+  else                          renderFull();
 }
 
-/** 穴埋え文のみモード */
+/** セクションヘッダーを作る共通関数 */
+function makeSecHeader(sec) {
+  const hdr = document.createElement('div');
+  hdr.className = 'sec-header';
+  hdr.innerHTML = `<span class="sec-title">${sec}</span>`;
+  return hdr;
+}
+
+/** 問題行の骨格（SVGアイコン付き）を作る */
+function makeQRow(qi, item) {
+  const row = document.createElement('div');
+  row.className = 'q-row';
+  row.id = `q-${qi}`;
+  const svg = sectionSVGs[item.sec];
+  if (svg) {
+    const iconEl = document.createElement('span');
+    iconEl.className = 'q-icon';
+    iconEl.innerHTML = svg;
+    row.appendChild(iconEl);
+  }
+  return row;
+}
+
+/** 抜粋（クリック）モード */
 function renderQuiz() {
   let lastSec = null;
 
   quizData.forEach((item, qi) => {
-    // reviewMode時: reviewSetに含まれるqiのみ表示
     if (reviewMode && !reviewSet.has(qi)) return;
 
-    // セクションヘッダー（変化時のみ）
-    const secKey = item.page + item.sec;
-    if (secKey !== lastSec) {
-      lastSec = secKey;
-      const hdr = document.createElement('div');
-      hdr.className = 'sec-header';
-      hdr.innerHTML = `<span class="sec-page">${item.page}</span><span class="sec-title">${item.sec}</span>`;
-      content.appendChild(hdr);
+    if (item.sec !== lastSec) {
+      lastSec = item.sec;
+      content.appendChild(makeSecHeader(item.sec));
     }
 
-    // 問題文
-    const row = document.createElement('div');
-    row.className = 'q-row';
-    row.id = `q-${qi}`;
-
+    const row = makeQRow(qi, item);
     let bi = 0;
     item.segs.forEach(seg => {
       if (seg.t !== undefined) {
@@ -113,25 +186,58 @@ function renderQuiz() {
         row.appendChild(makeBlank(qi, bi++, seg.b));
       }
     });
-
     content.appendChild(row);
   });
 
-  // 完了カードを最下部に追加
   content.appendChild(makeCompleteCard());
+}
+
+/** 記入モード */
+function renderTypeMode() {
+  let lastSec = null;
+
+  quizData.forEach((item, qi) => {
+    if (reviewMode && !reviewSet.has(qi)) return;
+
+    if (item.sec !== lastSec) {
+      lastSec = item.sec;
+      content.appendChild(makeSecHeader(item.sec));
+    }
+
+    const row = makeQRow(qi, item);
+    let bi = 0;
+    item.segs.forEach(seg => {
+      if (seg.t !== undefined) {
+        row.appendChild(document.createTextNode(seg.t));
+      } else {
+        const s = getState(qi, bi);
+        // 既回答はクリック用スパン、未回答は入力欄
+        row.appendChild(s !== 0
+          ? makeBlank(qi, bi, seg.b)
+          : makeTypeInput(qi, bi, seg.b));
+        bi++;
+      }
+    });
+    content.appendChild(row);
+  });
+
+  content.appendChild(makeCompleteCard());
+
+  // 最初の未回答入力欄にフォーカス
+  const first = content.querySelector('.blank-input:not([readonly])');
+  if (first) {
+    // 少し遅延してDOMが安定してからフォーカス
+    setTimeout(() => {
+      first.focus();
+      first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  }
 }
 
 /** 全文モード */
 function renderFull() {
   fullTextData.forEach(block => {
     switch (block.ty) {
-      case 'page': {
-        const el = document.createElement('div');
-        el.className = 'ft-page';
-        el.textContent = block.v;
-        content.appendChild(el);
-        break;
-      }
       case 'h2': {
         const el = document.createElement('div');
         el.className = 'ft-h2';
@@ -174,7 +280,6 @@ function updateScore() {
   let correct = 0, wrong = 0, total;
 
   if (reviewMode && reviewSet.size > 0) {
-    // 復習モード: reviewSetのqiだけカウント
     total = 0;
     quizData.forEach((item, qi) => {
       if (!reviewSet.has(qi)) return;
@@ -202,11 +307,11 @@ function updateScore() {
   headerScore.textContent = `✓ ${correct}　✗ ${wrong}　残 ${total - answered}`;
   scoreBarFill.style.width = `${pct}%`;
 
-  // 完了カード表示/更新
+  // 完了カード
   const card = document.getElementById('complete-card');
   if (card) {
     const isComplete = answered === total && total > 0;
-    const wasHidden = card.hidden;
+    const wasHidden  = card.hidden;
     card.hidden = !isComplete;
     if (isComplete) {
       const correctPct = Math.round(correct / total * 100);
@@ -217,7 +322,6 @@ function updateScore() {
       const rb = card.querySelector('#cmp-review-btn');
       rb.hidden = wrong === 0;
       rb.textContent = `復習 ${wrong}問`;
-      // 初めて完了した瞬間だけスクロール
       if (wasHidden) setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
     }
   }
@@ -251,29 +355,59 @@ function makeCompleteCard() {
 }
 
 // ══════════════════════════════════════════════════════════════
+//  タブ切り替え
+// ══════════════════════════════════════════════════════════════
+
+function setTab(mode) {
+  textMode = mode;
+  document.getElementById('tab-quiz').classList.toggle('active', mode === 'quiz');
+  document.getElementById('tab-type').classList.toggle('active', mode === 'type');
+  document.getElementById('tab-full').classList.toggle('active', mode === 'full');
+}
+
+document.getElementById('tab-quiz').addEventListener('click', () => {
+  setTab('quiz');
+  render();
+  updateScore();
+});
+
+document.getElementById('tab-type').addEventListener('click', () => {
+  setTab('type');
+  render();
+  updateScore();
+});
+
+document.getElementById('tab-full').addEventListener('click', () => {
+  // 全文モードに切り替えたら復習モード解除（キーボードも自然に閉じる）
+  reviewMode = false;
+  reviewSet.clear();
+  setTab('full');
+  render();
+  updateScore();
+  updateReviewBtn();
+});
+
+// ══════════════════════════════════════════════════════════════
 //  復習モード
 // ══════════════════════════════════════════════════════════════
 
 const reviewBtn = document.getElementById('review-btn');
 
 function enterReviewMode() {
-  // state=2 のqiを収集
   reviewSet.clear();
   blankStates.forEach((s, key) => {
     if (s === 2) reviewSet.add(+key.split('-')[0]);
   });
   if (reviewSet.size === 0) return;
 
-  // 不正解をリセット（再挑戦できるように state=0 へ）
   blankStates.forEach((s, key) => {
     if (s === 2) blankStates.set(key, 0);
   });
 
   reviewMode = true;
-  // 穴埋えモードへ強制切り替え
-  textMode = 'quiz';
-  document.getElementById('tab-quiz').classList.add('active');
-  document.getElementById('tab-full').classList.remove('active');
+  // 全文モード中なら抜粋モードへ戻す
+  if (textMode === 'full') setTab('quiz');
+  else setTab(textMode);
 
   render();
   updateScore();
@@ -298,7 +432,7 @@ function updateReviewBtn() {
     let wrongCount = 0;
     blankStates.forEach(s => { if (s === 2) wrongCount++; });
     reviewBtn.textContent = wrongCount > 0 ? `復習 ${wrongCount}問` : '復習';
-    reviewBtn.disabled = wrongCount === 0;
+    reviewBtn.disabled    = wrongCount === 0;
     reviewBtn.classList.remove('active');
   }
 }
@@ -316,33 +450,16 @@ function resetAll() {
   blankStates.clear();
   reviewMode = false;
   reviewSet.clear();
-  document.querySelectorAll('.blank').forEach(el => applyBlankState(el));
+
+  if (textMode === 'type') {
+    // 記入モードは再描画でinputを復元する
+    render();
+  } else {
+    document.querySelectorAll('.blank').forEach(el => applyBlankState(el));
+  }
   updateScore();
   updateReviewBtn();
 }
-
-// ══════════════════════════════════════════════════════════════
-//  イベント
-// ══════════════════════════════════════════════════════════════
-
-document.getElementById('tab-quiz').addEventListener('click', () => {
-  textMode = 'quiz';
-  document.getElementById('tab-quiz').classList.add('active');
-  document.getElementById('tab-full').classList.remove('active');
-  render();
-  updateScore();
-});
-
-document.getElementById('tab-full').addEventListener('click', () => {
-  textMode = 'full';
-  reviewMode = false; // 全文モードに切り替えたら復習モード解除
-  reviewSet.clear();
-  document.getElementById('tab-full').classList.add('active');
-  document.getElementById('tab-quiz').classList.remove('active');
-  render();
-  updateScore();
-  updateReviewBtn();
-});
 
 document.getElementById('reset-btn').addEventListener('click', () => {
   if (confirm('進捗をリセットしますか？')) resetAll();
@@ -357,7 +474,6 @@ function init() {
   updateScore();
   updateReviewBtn();
 
-  // Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }

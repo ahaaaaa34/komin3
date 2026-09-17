@@ -1,48 +1,896 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>家庭基礎 — 穴埋めクイズ</title>
-  <meta name="description" content="家庭基礎の穴埋め学習クイズ。穴を押して答えを確認。">
-  <meta name="theme-color" content="#1a1a1a">
-  <link rel="manifest" href="./manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席を練習するドリル。">
+<meta name="theme-color" content="#F4EFE4">
+<link rel="manifest" href="./manifest.json">
+<title>鴻門之会 ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --paper:#F4EFE4; --surface:#FFFCF5; --surface2:#EDE6D6;
+  --ink:#1D1813; --ink2:#5B5246; --ink3:#948A76;
+  --rule:#D6CCB6; --rule2:#BCAF93;
+  --shu:#BE3A2B; --shu-soft:rgba(190,58,43,.13);
+  --dai:#D9781A; --dai-soft:rgba(217,120,26,.15);
+  --ai:#2B5B8C; --ai-soft:rgba(43,91,140,.12);
+  --ok:#2E7550; --ok-soft:rgba(46,117,80,.12);
+  --mincho:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  --gothic:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#15120E; --surface:#1F1B15; --surface2:#2A251D;
+  --ink:#F0E8D8; --ink2:#BCB09B; --ink3:#867C6A;
+  --rule:#3A3328; --rule2:#4E4536;
+  --shu:#E5796A; --shu-soft:rgba(229,121,106,.16);
+  --dai:#F0A24E; --dai-soft:rgba(240,162,78,.16);
+  --ai:#7FB2E0; --ai-soft:rgba(127,178,224,.15);
+  --ok:#6CC498; --ok-soft:rgba(108,196,152,.15);
+}}
+:root[data-theme="dark"]{
+  --paper:#15120E; --surface:#1F1B15; --surface2:#2A251D;
+  --ink:#F0E8D8; --ink2:#BCB09B; --ink3:#867C6A;
+  --rule:#3A3328; --rule2:#4E4536;
+  --shu:#E5796A; --shu-soft:rgba(229,121,106,.16);
+  --dai:#F0A24E; --dai-soft:rgba(240,162,78,.16);
+  --ai:#7FB2E0; --ai-soft:rgba(127,178,224,.15);
+  --ok:#6CC498; --ok-soft:rgba(108,196,152,.15);
+}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--gothic);
+  font-size:15px;line-height:1.8;-webkit-text-size-adjust:100%}
+img{max-width:100%}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+input{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2.5px solid var(--dai);outline-offset:2px}
+
+/* ── ヘッダー ── */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  background:color-mix(in srgb,var(--surface) 92%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.hd{max-width:780px;margin:0 auto;padding-block:9px;padding-inline:16px;
+  display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--mincho);font-weight:800;font-size:19px;letter-spacing:.12em}
+.brand .sub{font-family:var(--gothic);font-weight:400;font-size:11px;letter-spacing:.14em;
+  color:var(--ink3);margin-inline-start:8px}
+.themebtn{margin-inline-start:auto;background:none;border:1px solid var(--rule2);
+  border-radius:999px;padding:3px 11px;font-size:11.5px;color:var(--ink2);letter-spacing:.08em}
+nav{max-width:780px;margin:0 auto;padding-inline:16px;padding-bottom:8px;
+  display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;background:none;border:1px solid var(--rule2);border-radius:999px;
+  padding:5px 11px;font-size:12.5px;letter-spacing:.04em;color:var(--ink2);transition:.14s}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper);font-weight:700}
+.tab .n{font-size:10px;color:var(--ink3);margin-inline-start:4px;font-variant-numeric:tabular-nums}
+.tab[aria-selected="true"] .n{color:color-mix(in srgb,var(--paper) 70%,transparent)}
+
+main{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 72px}
+
+/* ── 共通パーツ ── */
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:5px;
+  padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+.meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  font-size:11.5px;letter-spacing:.1em;color:var(--ink3)}
+.badge{border:1px solid var(--rule2);border-radius:3px;padding:1px 7px;font-size:11px;letter-spacing:.08em}
+.badge.shu{color:var(--shu);border-color:var(--shu)}
+.badge.dai{color:var(--dai);border-color:var(--dai);background:var(--dai-soft)}
+.ask{font-size:14px;font-weight:700;letter-spacing:.03em;line-height:1.7}
+.kanbun{font-family:var(--mincho);font-weight:500;font-size:clamp(17px,4.6vw,21px);
+  line-height:2.15;letter-spacing:.1em;overflow-wrap:anywhere}
+.big{font-family:var(--mincho);font-weight:800;font-size:clamp(40px,13vw,58px);
+  line-height:1.25;letter-spacing:.06em;text-align:center;padding-block:4px}
+mark.shu{background:var(--shu-soft);color:inherit;border-bottom:4px solid var(--shu);
+  padding:0 .06em .04em;border-radius:1px}
+.ring{box-shadow:0 0 0 2.5px var(--dai);border-radius:999px;padding:.08em .3em;
+  background:var(--dai-soft);display:inline-block}
+.blue{color:var(--ai);border-bottom:1.5px solid var(--ai)}
+
+.row{display:flex;gap:9px;flex-wrap:wrap}
+.btn{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:4px;
+  padding:9px 18px;font-size:14px;font-weight:700;letter-spacing:.08em;transition:.14s}
+.btn:hover{opacity:.86}
+.btn.ghost{background:none;color:var(--ink2);border-color:var(--rule2);font-weight:500}
+.btn.sm{padding:6px 13px;font-size:12.5px;font-weight:500}
+.btn:disabled{opacity:.4;cursor:default}
+.ans-in{flex:1;min-width:150px;background:var(--surface2);border:1px solid var(--rule2);
+  border-radius:4px;padding:10px 13px;font-size:17px;letter-spacing:.06em}
+
+.choices{display:flex;flex-direction:column;gap:8px}
+.ch{display:flex;gap:11px;align-items:flex-start;text-align:start;background:var(--surface2);
+  border:1px solid var(--rule);border-radius:4px;padding:11px 13px;font-size:14.5px;line-height:1.6;transition:.12s}
+.ch:hover:not(:disabled){border-color:var(--ink2)}
+.ch .k{font-family:var(--mincho);font-weight:700;color:var(--ink3);flex:none}
+.ch.pick{border-color:var(--ink);border-width:1.5px}
+.ch.right{border-color:var(--ok);background:var(--ok-soft)}
+.ch.right .k{color:var(--ok)}
+.ch.wrong{border-color:var(--shu);background:var(--shu-soft)}
+.ch.wrong .k{color:var(--shu)}
+.ch:disabled{cursor:default}
+
+.fb{border-inline-start:3px solid var(--rule2);padding:2px 0 2px 13px;
+  display:flex;flex-direction:column;gap:7px}
+.fb.ok{border-color:var(--ok)}
+.fb.ng{border-color:var(--shu)}
+.fb .head{font-size:13px;font-weight:700;letter-spacing:.1em}
+.fb.ok .head{color:var(--ok)}
+.fb.ng .head{color:var(--shu)}
+.fb .sol{font-family:var(--mincho);font-size:19px;font-weight:700;letter-spacing:.08em;line-height:1.6}
+.fb .kud{font-family:var(--mincho);font-size:14.5px;color:var(--ink2);letter-spacing:.04em;line-height:1.9}
+.fb .note{font-size:13px;color:var(--ink2);line-height:1.75}
+
+.bar{height:3px;background:var(--surface2);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.stat{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--ink3);
+  letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.stat b{color:var(--ink);font-size:13px}
+.deckhead{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.deckhead .line1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lead{font-size:13px;color:var(--ink2);line-height:1.8}
+
+/* ── 一覧 ── */
+.list{display:flex;flex-direction:column;gap:0;margin-top:4px}
+.li{display:flex;gap:13px;align-items:baseline;padding:11px 2px;border-bottom:1px dashed var(--rule)}
+.li:last-child{border-bottom:none}
+.li .q{font-family:var(--mincho);font-size:17px;font-weight:700;letter-spacing:.06em;flex:none;min-width:3.4em}
+.li .a{font-size:14px;color:var(--ink2)}
+.li .a em{font-style:normal;color:var(--shu);font-weight:700}
+
+/* ── 座席図 ── */
+.compass{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:9px;margin-block:4px}
+.slot{background:var(--surface2);border:1.5px dashed var(--rule2);border-radius:5px;
+  min-height:92px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;gap:6px;transition:.14s}
+.slot.act{border-style:solid;border-color:var(--dai);background:var(--dai-soft)}
+.slot.right{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.slot.wrong{border-style:solid;border-color:var(--shu);background:var(--shu-soft)}
+.slot .dir{font-family:var(--mincho);font-weight:800;font-size:19px;letter-spacing:.1em}
+.slot .hint{font-size:10.5px;color:var(--ink3);letter-spacing:.04em;text-align:center;line-height:1.5}
+.slot.n{grid-column:2;grid-row:1}
+.slot.w{grid-column:1;grid-row:2}
+.slot.e{grid-column:3;grid-row:2}
+.slot.s{grid-column:2;grid-row:3}
+.mid{grid-column:2;grid-row:2;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;font-family:var(--mincho);color:var(--ink3);
+  font-size:12.5px;letter-spacing:.14em;text-align:center;line-height:1.6}
+.out{margin-top:9px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border:1.5px dashed var(--rule2);border-radius:5px;padding:9px 11px;min-height:56px}
+.out.act{border-style:solid;border-color:var(--dai);background:var(--dai-soft)}
+.out.right{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.out.wrong{border-style:solid;border-color:var(--shu);background:var(--shu-soft)}
+.out .dir{font-family:var(--mincho);font-weight:700;font-size:14px;letter-spacing:.1em;flex:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:9px;
+  background:var(--surface2);border:1px solid var(--rule);border-radius:5px}
+.chip{font-family:var(--mincho);font-weight:700;font-size:15.5px;letter-spacing:.08em;
+  border:1.5px solid var(--rule2);border-radius:4px;padding:5px 11px;background:var(--surface);
+  color:var(--ink);transition:.12s;white-space:nowrap}
+.chip.kou{border-color:var(--ai);color:var(--ai);background:var(--ai-soft)}
+.chip.hai{border-color:var(--shu);color:var(--shu);background:var(--shu-soft)}
+.chip.sel{box-shadow:0 0 0 2.5px var(--dai);border-color:var(--dai)}
+.chip small{font-family:var(--gothic);font-weight:400;font-size:10px;letter-spacing:0;
+  color:var(--ink3);margin-inline-start:4px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);letter-spacing:.06em}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-inline-end:5px}
+
+/* ── 本文 ── */
+.passage{display:flex;flex-direction:column;gap:11px}
+.hakubun{background:var(--surface2);border:1px solid var(--rule);border-radius:5px;padding:14px 15px}
+.hakubun.tate{writing-mode:vertical-rl;max-height:58vh;overflow:auto;
+  font-family:var(--mincho);font-size:18px;line-height:2.1;letter-spacing:.12em}
+.kudashi{font-family:var(--mincho);font-size:16px;letter-spacing:.05em;line-height:2.1}
+.yaku{font-size:14px;color:var(--ink2);line-height:1.95}
+.lbl{font-size:11px;letter-spacing:.16em;color:var(--ink3);font-weight:700}
+h2.sec{font-family:var(--mincho);font-size:17px;font-weight:800;letter-spacing:.1em;
+  margin:26px 0 12px;padding-bottom:7px;border-bottom:1.5px solid var(--ink);text-wrap:balance}
+h2.sec:first-of-type{margin-top:4px}
+.info{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--dai);
+  border-radius:4px;padding:13px 15px;font-size:13.5px;line-height:1.85;color:var(--ink2)}
+.info b{color:var(--ink)}
+.done{text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center;padding-block:10px}
+.done .sc{font-family:var(--mincho);font-size:40px;font-weight:800;letter-spacing:.04em}
+.done .sc small{font-size:17px;color:var(--ink3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+  html,body{min-height:100%}
+  :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+</style>
 </head>
 <body>
-
-<header id="app-header">
-  <span id="header-title">家庭基礎</span>
-
-  <div class="tab-group" role="tablist">
-    <button id="tab-quiz" class="tab-btn active" role="tab">抜粋</button>
-    <button id="tab-type" class="tab-btn"        role="tab">記入</button>
-    <button id="tab-full" class="tab-btn"        role="tab">全文</button>
+<header>
+  <div class="hd">
+    <span class="brand">鴻門之会<span class="sub">史記・司馬遷</span></span>
+    <button class="themebtn" id="theme">表示</button>
   </div>
-
-  <div id="legend" aria-hidden="true">
-    <span class="lbl-blank"></span>未解答
-    <span class="lbl-correct"></span>正解
-    <span class="lbl-wrong"></span>不正解
-  </div>
-
-  <span id="header-score">✓ 0　✗ 0　残 —</span>
-
-  <button id="review-btn" disabled>復習</button>
-  <button id="reset-btn">リセット</button>
+  <nav role="tablist" id="nav"></nav>
 </header>
+<main id="main"></main>
+<script>
+"use strict";
+/* ══ データ ══════════════════════════════════════════ */
 
-<main id="main">
-  <div id="content"></div>
-</main>
+// 読み（プリントの赤い線）
+const YOMI = [
+ {id:'y1', sh:1, no:'①', k:'見', a:'まみゆ', ac:['まみゆ','まみえん','まみえ','まみえる'],
+  line:'沛公旦日従百余騎、来{見}項王、至鴻門、謝曰、',
+  ku:'沛公旦日百余騎を従へ、来たりて項王に見えんとし、鴻門に至り、謝して曰はく、',
+  nt:'「見（まみ）ゆ」＝目上の人にお目にかかる。「みる」と読まない。'},
+ {id:'y2', sh:1, no:'②', k:'与', a:'と', ac:['と'],
+  line:'臣{与}将軍勠力而攻秦。',
+  ku:'臣将軍と力を勠せて秦を攻む。',
+  nt:'「AとBと」の「と」。ワーク語句2の用法問題もこれ。'},
+ {id:'y3', sh:1, no:'③', k:'而', a:'読まない（置き字）', ac:['よまない','読まない','おきじ','置き字','なし','よまん'],
+  line:'臣与将軍勠力{而}攻秦。',
+  ku:'臣将軍と力を勠せて秦を攻む。',
+  nt:'順接の置き字。読まず、上の語の送り仮名「て」で表す。'},
+ {id:'y4', sh:1, no:'④', k:'自', a:'みづから（みずから）', ac:['みずから','みづから'],
+  line:'然不{自}意、能先入関破秦、',
+  ku:'然れども自ら意はざりき、',
+  nt:'「自ら意はず」＝自分でも思いもしなかった。'},
+ {id:'y5', sh:1, no:'⑤', k:'能', a:'よく', ac:['よく'],
+  line:'然不自意、{能}先入関破秦、',
+  ku:'能く先に関に入りて秦を破り、',
+  nt:'「能く」＝〜することができる。可能。'},
+ {id:'y6', sh:1, no:'⑥', k:'小人', a:'しょうじん', ac:['しょうじん'],
+  line:'今者有{小人}之言、',
+  ku:'今者小人の言有りて、',
+  nt:'意味は「つまらない人間」。ワーク語句②と同じ。'},
+ {id:'y7', sh:1, no:'⑦', k:'令', a:'しむ', ac:['しむ','しめ','せしむ','しむる'],
+  line:'{令}将軍与臣有郤。」',
+  ku:'将軍と臣とをして郤有らしむ。',
+  nt:'使役「Aをして B（せ）しむ」＝AにBさせる。'},
+ {id:'y8', sh:1, no:'語注', k:'旦日', a:'たんじつ', ac:['たんじつ'],
+  line:'沛公{旦日}従百余騎、',
+  ku:'沛公旦日百余騎を従へ、',
+  nt:'意味は「翌朝」。ワーク語句①と同じ。'},
+ {id:'y9', sh:1, no:'語注', k:'郤', a:'げき', ac:['げき'],
+  line:'令将軍与臣有{郤}。」',
+  ku:'将軍と臣とをして郤有らしむ。',
+  nt:'意味は「仲たがい・不和」。'},
+ {id:'y10', sh:2, no:'⑦', k:'此', a:'これ', ac:['これ','こレ'],
+  line:'項王曰、「{此}沛公左司馬曹無傷言之。',
+  ku:'項王曰はく、「此れ沛公の左司馬曹無傷之を言へり。',
+  nt:'「此れ」＝曹無傷が告げ口をした、ということ。'},
+ {id:'y11', sh:2, no:'⑧', k:'何以', a:'なにをもって', ac:['なにをもって','なにをもつて'],
+  line:'不然、籍{何以}至此。」',
+  ku:'然らずんば、籍何を以て此に至らん。',
+  nt:'反語。「どうして〜だろうか、いや〜ない」。「籍」は項羽の名。'},
+ {id:'y12', sh:2, no:'⑨', k:'因', a:'よりて', ac:['よりて','よつて','よって'],
+  line:'項王即日{因}留沛公与飲。',
+  ku:'項王即日因りて沛公を留めて与に飲む。',
+  nt:'意味は「そのため・そこで」。'},
+ {id:'y13', sh:2, no:'⑩', k:'也', a:'なり', ac:['なり'],
+  line:'亜父者、范増{也}。',
+  ku:'亜父とは、范増なり。',
+  nt:'「〜者、〜也」＝「〜とは〜である」。'},
+ {id:'y14', sh:2, no:'⑪', k:'以', a:'もって', ac:['もって','もつて'],
+  line:'挙所佩玉玦{以}示之者三。',
+  ku:'佩ぶる所の玉玦を挙げて以て之に示すこと三たびなり。',
+  nt:'「以て」＝それによって。'},
+ {id:'y15', sh:2, no:'⑫', k:'若', a:'なんじ', ac:['なんじ','なんぢ'],
+  line:'{若}入前為寿。',
+  ku:'若入りて前みて寿を為せ。',
+  nt:'意味は「お前」。ワーク句法②の「若」と同じ。'},
+ {id:'y16', sh:2, no:'語注', k:'数', a:'しばしば', ac:['しばしば'],
+  line:'范増{数}目項王、',
+  ku:'范増数項王に目し、',
+  nt:'「たびたび・何度も」。「目す」は目くばせする。'},
+ {id:'y17', sh:2, no:'語注', k:'与', a:'ともに', ac:['ともに'],
+  line:'項王即日因留沛公{与}飲。',
+  ku:'項王即日因りて沛公を留めて与に飲む。',
+  nt:'ここの「与」は「ともに」。②の「と」と読み分ける。'},
+ {id:'y18', sh:2, no:'語注', k:'為人', a:'ひととなり', ac:['ひととなり'],
+  line:'「君王{為人}不忍。',
+  ku:'君王人と為り忍びず。',
+  nt:'意味は「人柄」。「人と為り」と読む。'}
+];
 
-<div id="score-bar" aria-hidden="true">
-  <div id="score-bar-fill"></div>
-</div>
+// 指示語（プリントのオレンジ丸・囲み）
+const SHIJI = [
+ {id:'s1', star:1, line:'得復見将軍於{此}。', ask:'この「此」が指しているものは？',
+  ch:['鴻門（今、項王と会っているこの場所）','函谷関','河南の戦場','咸陽の秦の宮殿'], an:0,
+  nt:'プリントのオレンジ丸。「復た将軍に此に見ゆるを得んとは」＝またこの鴻門でお会いできるとは。'},
+ {id:'s2', line:'{臣}与将軍勠力而攻秦。', ask:'「臣」は誰を指す？',
+  ch:['沛公（劉邦）自身','項王（項羽）','曹無傷','張良'], an:0,
+  nt:'「臣」は臣下がへりくだって使う一人称。ここでは話し手の沛公。'},
+ {id:'s3', line:'臣与{将軍}勠力而攻秦。', ask:'「将軍」は誰を指す？',
+  ch:['項王（項羽）','沛公（劉邦）','項伯','項荘'], an:0,
+  nt:'沛公が目の前の項王を「将軍」と呼んで持ち上げている。'},
+ {id:'s4', line:'今者有{小人}之言、', ask:'「小人」とはどんな者か？',
+  ch:['告げ口をしたつまらない人間（曹無傷ら）','位の低い役人','年少の家来','項王の側近の范増'], an:0,
+  nt:'「小人」＝つまらない人間。仲たがいの原因を第三者のせいにしている。'},
+ {id:'s5', line:'此沛公左司馬曹無傷言{之}。', ask:'「之」が指す内容は？',
+  ch:['沛公が関中の王になろうとしている、ということ','沛公が鴻門に来たこと','項王が兵を退いたこと','范増が玉玦を挙げたこと'], an:0,
+  nt:'曹無傷の告げ口の中身。これを項王がばらしてしまった。'},
+ {id:'s6', line:'不然、籍何以至{此}。」', ask:'この「此」が指すものは？',
+  ch:['沛公を攻めようとした、今のような事態','鴻門という場所','函谷関','項伯の裏切り'], an:0,
+  nt:'同じ「此」でも指す内容が違う。場所か事態かを見分ける。'},
+ {id:'s7', line:'挙所佩玉玦以示{之}者三。', ask:'「之」は誰を指す？',
+  ch:['項王','沛公','項荘','張良'], an:0,
+  nt:'范増が玉玦を示した相手＝項王。「沛公を討て」という合図。'},
+ {id:'s8', line:'{亜父}南嚮坐。亜父者、范増也。', ask:'「亜父」とは誰？',
+  ch:['范増','項伯','曹無傷','張良'], an:0,
+  nt:'「亜父」＝父に次いで敬う人。項王が范増をこう呼んだ。'},
+ {id:'s9', line:'「{君王}為人不忍。', ask:'「君王」は誰を指す？',
+  ch:['項王','沛公','項荘','范増'], an:0,
+  nt:'范増が項荘に、主君である項王のことを言っている。'},
+ {id:'s10', line:'{若}入前為寿。', ask:'この「若」は誰に呼びかけている？',
+  ch:['項荘','項伯','沛公','張良'], an:0,
+  nt:'范増が呼び出した項荘への命令。「若」＝お前。'},
+ {id:'s11', line:'不然、{籍}何以至此。」', ask:'「籍」とは誰？',
+  ch:['項王（項羽）自身','沛公','曹無傷','亜父'], an:0,
+  nt:'項羽の名が「籍」。自分の名を出して自称している。'}
+];
 
-<script type="module" src="./app.js"></script>
+// ワーク（3枚目）上1・2／下2
+const WORK = [
+ {id:'w1', tag:'語句 1', type:'t', head:'旦日', sub:'（三九・2）',
+  ask:'読みをひらがな（現代仮名遣い）で書きなさい。', a:'たんじつ', ac:['たんじつ'],
+  nt:'「沛公旦日百余騎を従へ」の「旦日」。'},
+ {id:'w2', tag:'語句 1', type:'c', head:'旦日', ask:'「旦日」の意味をあとから選びなさい。',
+  ch:['一日中','二、三日','翌朝'], an:2, nt:'ウ。鴻門の会は、項伯が沛公に知らせた「その翌朝」の出来事。'},
+ {id:'w3', tag:'語句 2', type:'t', head:'小人', sub:'（三九・6）',
+  ask:'読みをひらがな（現代仮名遣い）で書きなさい。', a:'しょうじん', ac:['しょうじん'],
+  nt:'「今者小人の言有りて」の「小人」。'},
+ {id:'w4', tag:'語句 2', type:'c', head:'小人', ask:'「小人」の意味をあとから選びなさい。',
+  ch:['無関係の者','つまらない者','位の低い者'], an:1,
+  nt:'イ。身分ではなく人間の器の小ささをいう語。対義語は「君子」。'},
+ {id:'w5', tag:'句法 2', type:'t', head:'若属皆且為所虜。', sub:'（四二・3）', big:1,
+  ask:'次の漢文を書き下し文にしなさい。', a:'若が属皆且に虜とする所と為らんとす。',
+  ac:['若が属皆且に虜とする所と為らんとす','なんぢがぞくみなまさにとりことするところとならんとす','汝が属皆且に虜とする所と為らんとす','若が属、皆且に虜とする所と為らんとす'],
+  nt:'ポイント3つ／①「若」＝なんぢ（お前）　②「且に〜んとす」＝再読文字、今にも〜しようとする　③「為A所B」＝AのBする所と為る（受身）。意味は「お前たちは皆、今にも捕虜にされてしまうだろう」。'}
+];
+
+// 座席（4枚目）
+const SEATS = {
+  w:{dir:'西', label:'東嚮して坐す', who:['項王','項伯'], note:'東を向く＝最上座。項王の傲慢さが表れる。'},
+  n:{dir:'北', label:'南嚮して坐す', who:['亜父'], note:'「亜父」＝范増。項王に次ぐ席。'},
+  s:{dir:'南', label:'北嚮して坐す', who:['沛公'], note:'客なのに下座。項王が沛公を格下に見ている。'},
+  e:{dir:'東', label:'西嚮して侍す', who:['張良'], note:'「坐」ではなく「侍」＝お供として控える。最も低い扱い。'},
+  o:{dir:'席なし', label:'范増に呼び出される', who:['項荘'], note:'外から呼ばれて入り、剣舞を舞う。'}
+};
+const PEOPLE = [
+ {n:'項王', side:'kou', s:'項羽'},
+ {n:'項伯', side:'kou', s:'項羽の叔父'},
+ {n:'亜父', side:'kou', s:'范増'},
+ {n:'項荘', side:'kou', s:'項羽の一族'},
+ {n:'沛公', side:'hai', s:'劉邦'},
+ {n:'張良', side:'hai', s:'沛公の参謀'}
+];
+const SEKI = [
+ {id:'k1', ask:'本文で「北嚮して坐す」とあるのは誰か。', ch:['沛公','項王','亜父','張良'], an:0,
+  nt:'北を向く＝南側にすわる。客の沛公が下座に置かれている。'},
+ {id:'k2', ask:'「東嚮して坐す」のは誰か。', ch:['項王と項伯','項王と亜父','沛公と張良','項荘と項伯'], an:0,
+  nt:'東を向く＝西側にすわる。ここが最上座。'},
+ {id:'k3', ask:'「南嚮して坐す」のは誰か。', ch:['亜父（范増）','張良','項伯','沛公'], an:0,
+  nt:'南を向く＝北側にすわる。'},
+ {id:'k4', ask:'「西嚮して侍す」のは誰か。', ch:['張良','沛公','項荘','亜父'], an:0,
+  nt:'張良だけ「坐」ではなく「侍」。すわらずに控える、低い扱い。'},
+ {id:'k5', ask:'図の上で、西がわ（左）にいるのは？', ch:['項王・項伯','亜父','沛公','張良'], an:0,
+  nt:'「東嚮」＝東を向く＝西がわにすわる。向きと位置は逆になる。'},
+ {id:'k6', ask:'図の上で、北がわ（上）にいるのは？', ch:['亜父（范増）','項王','沛公','張良'], an:0,
+  nt:'「南嚮」＝南を向く＝北がわ。'},
+ {id:'k7', ask:'席についていない人物は誰か。', ch:['項荘','張良','項伯','亜父'], an:0,
+  nt:'項荘は范増に呼び出されてから登場し、剣舞を舞う。'},
+ {id:'k8', ask:'范増が玉玦を挙げて合図したのは何回か。', ch:['三回','一回','二回','五回'], an:0,
+  nt:'「示すこと三たびなり」。玦＝決断せよ、の合図。'},
+ {id:'k9', ask:'范増の合図に対する項王の反応は？', ch:['黙ったまま応じなかった','すぐに沛公を斬った','范増を叱った','席を立って出て行った'], an:0,
+  nt:'「項王黙然として応ぜず」。ここが場面の転換点。'},
+ {id:'k10', ask:'項伯が剣を抜いて舞ったのは何のためか。', ch:['沛公を守るため','沛公を殺すため','項王を楽しませるため','張良を試すため'], an:0,
+  nt:'項伯は昔、張良に命を助けられた恩がある。身をもって沛公をかばった。'},
+ {id:'k11', ask:'項荘が剣を持って舞ったのは何のためか。', ch:['沛公を殺すため','沛公を守るため','余興のため','范増を守るため'], an:0,
+  nt:'范増の命令。「因りて沛公を坐に撃ちて、之を殺せ」。'}
+];
+
+// 本文
+const TEXT = [
+ {t:'一　沛公、鴻門に至りて謝す', pr:'プリント1',
+  h:'沛公旦日従百余騎、来見項王、至鴻門、謝曰、「臣与将軍勠力而攻秦。将軍戦河北、臣戦河南。然不自意能先入関破秦、得復見将軍於此。今者有小人之言、令将軍与臣有郤。」',
+  k:'沛公旦日百余騎を従へ、来たりて項王に見えんとし、鴻門に至り、謝して曰はく、「臣将軍と力を勠せて秦を攻む。将軍は河北に戦ひ、臣は河南に戦ふ。然れども自ら意はざりき、能く先に関に入りて秦を破り、復た将軍に此に見ゆるを得んとは。今者小人の言有りて、将軍と臣とをして郤有らしむ。」と。',
+  y:'沛公は翌朝、百余騎を従えて項王に会いに来て、鴻門に着いてわびて言った、「私は将軍と力を合わせて秦を攻めました。将軍は黄河の北で戦い、私は黄河の南で戦いました。しかし自分でも思いもしませんでした、先に函谷関に入って秦を破り、またこの地で将軍にお目にかかれようとは。今、つまらない者の告げ口があって、将軍と私との間に仲たがいを生じさせております。」'},
+ {t:'二　項王、沛公を留めて飲む', pr:'プリント2',
+  h:'項王曰、「此沛公左司馬曹無傷言之。不然、籍何以至此。」項王即日因留沛公与飲。項王・項伯東嚮坐、亜父南嚮坐。亜父者、范増也。沛公北嚮坐、張良西嚮侍。',
+  k:'項王曰はく、「此れ沛公の左司馬曹無傷之を言へり。然らずんば、籍何を以て此に至らん。」と。項王即日因りて沛公を留めて与に飲む。項王・項伯は東嚮して坐し、亜父は南嚮して坐す。亜父とは、范増なり。沛公は北嚮して坐し、張良は西嚮して侍す。',
+  y:'項王が言った、「これは沛公の左司馬の曹無傷がそう言ったのだ。そうでなければ、この籍（＝私）がどうしてこんなことになろうか。」項王はその日そのまま沛公を引き留めていっしょに酒を飲んだ。項王と項伯は東を向いてすわり、亜父は南を向いてすわった。亜父とは范増のことである。沛公は北を向いてすわり、張良は西を向いて（お供として）ひかえた。'},
+ {t:'三　范増、項荘に沛公を討たせようとする', pr:'プリント2',
+  h:'范増数目項王、挙所佩玉玦以示之者三。項王黙然不応。范増起、出召項荘、謂曰、「君王為人不忍。若入前為寿。寿畢、請以剣舞、因撃沛公於坐、殺之。不者、若属皆且為所虜。」',
+  k:'范増数項王に目し、佩ぶる所の玉玦を挙げて以て之に示すこと三たびなり。項王黙然として応ぜず。范増起ち、出でて項荘を召し、謂ひて曰はく、「君王人と為り忍びず。若入りて前みて寿を為せ。寿畢はらば、請ふ剣を以て舞ひ、因りて沛公を坐に撃ちて、之を殺せ。不ずんば、若が属皆且に虜とする所と為らんとす。」と。',
+  y:'范増は何度も項王に目くばせし、身につけていた玉玦を挙げて項王に示すこと三度であった。項王は黙ったまま応じなかった。范増は立ち上がり、外に出て項荘を呼んで言った、「王は人柄が（残忍になりきれず）我慢できないお方だ。お前が入って進み出て長寿を祝う酒をすすめよ。祝いが終わったら、剣舞を願い出て、そのまま沛公を席で討ち取り、殺してしまえ。そうしなければ、お前たちは皆、今にも捕虜にされてしまうだろう。」'}
+];
+
+/* ══ ユーティリティ ══════════════════════════════════ */
+const $ = (s, r=document) => r.querySelector(s);
+const SAVE = 'komon-no-kai-v1';
+let store = {res:{}, theme:'auto'};
+try { const r = localStorage.getItem(SAVE); if (r) store = Object.assign(store, JSON.parse(r)); } catch(e){}
+function save(){ try { localStorage.setItem(SAVE, JSON.stringify(store)); } catch(e){} }
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function mark(line, kind){
+  return esc(line).replace(/\{([^}]*)\}/g, (m,p) =>
+    kind === 'ring' ? '<span class="ring">'+p+'</span>' : '<mark class="shu">'+p+'</mark>');
+}
+function norm(s){
+  return String(s||'').normalize('NFKC')
+    .replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0)-0x60))
+    .replace(/\s/g,'')
+    .replace(/[、。，．,.「」『』・!?！？]/g,'')
+    .replace(/ぢ/g,'じ').replace(/づ/g,'ず').replace(/ゐ/g,'い').replace(/ゑ/g,'え')
+    .replace(/っ/g,'つ').replace(/ゃ/g,'や').replace(/ゅ/g,'ゆ').replace(/ょ/g,'よ');
+}
+function judge(input, item){
+  const n = norm(input);
+  if (!n) return false;
+  return [item.a].concat(item.ac||[]).some(a => norm(a) === n);
+}
+const KANA = ['ア','イ','ウ','エ'];
+
+/* ══ デッキ ══════════════════════════════════════════ */
+const DECKS = {
+  yomi:{name:'読み',   items:YOMI,  kind:'text',
+        lead:'プリントの<b>赤い線</b>のところ。読みをひらがなで入力する。'},
+  shiji:{name:'指示語', items:SHIJI, kind:'choice',
+        lead:'<b>オレンジの丸</b>＝その語が指しているものが答え。囲みの語もまとめて確認する。'},
+  work:{name:'ワーク',  items:WORK,  kind:'mixed',
+        lead:'問題集の<b>語句 1・2</b>と<b>句法 2</b>。'},
+  seki:{name:'座席',   items:SEKI,  kind:'choice',
+        lead:'東西南北にだれがいるか。全部で<b>6人</b>。'}
+};
+const TABS = [['yomi','読み'],['shiji','指示語'],['work','ワーク'],['seki','座席'],['text','本文']];
+const run = {};   // デッキごとの進行状況
+for (const key in DECKS) run[key] = {q:null, i:0, state:'q', picked:-1, list:false};
+
+function ids(key){ return DECKS[key].items.map(x => x.id); }
+function score(key){
+  const all = ids(key);
+  return {ok: all.filter(id => store.res[id] === 1).length, n: all.length};
+}
+function startDeck(key, only){
+  const d = run[key];
+  d.q = (only || ids(key)).slice();
+  d.i = 0; d.state = 'q'; d.picked = -1;
+}
+
+/* ══ 画面 ══════════════════════════════════════════ */
+let tab = 'yomi';
+const main = $('#main');
+
+function renderNav(){
+  const nav = $('#nav');
+  nav.innerHTML = '';
+  for (const [key, label] of TABS){
+    const b = document.createElement('button');
+    b.className = 'tab'; b.type = 'button'; b.setAttribute('role','tab');
+    b.setAttribute('aria-selected', String(key === tab));
+    if (key === 'text') b.textContent = label;
+    else { const s = score(key); b.innerHTML = esc(label) + '<span class="n">' + s.ok + '/' + s.n + '</span>'; }
+    b.onclick = () => { tab = key; render(); window.scrollTo(0,0); };
+    nav.appendChild(b);
+  }
+}
+
+function render(){
+  renderNav();
+  main.innerHTML = '';
+  if (tab === 'text') return renderText();
+  if (tab === 'seki'){ main.appendChild(placeCard()); }
+  main.appendChild(deckView(tab));
+}
+
+/* ── デッキ表示 ── */
+function deckView(key){
+  const D = DECKS[key], d = run[key];
+  if (!d.q) startDeck(key);
+  const wrap = document.createElement('div');
+
+  const head = document.createElement('div');
+  head.className = 'deckhead';
+  const s = score(key);
+  head.innerHTML =
+    '<div class="line1">' +
+      (key === 'seki' ? '<h2 class="sec" style="margin:0;border:none;padding:0">一問一答</h2>' : '') +
+      '<span class="stat"><b>' + s.ok + '</b> / ' + s.n + ' 正解</span>' +
+      '<span class="stat" style="margin-inline-start:auto"></span>' +
+    '</div>' +
+    '<div class="bar"><i style="width:' + (s.n ? s.ok/s.n*100 : 0) + '%"></i></div>' +
+    '<p class="lead">' + D.lead + '</p>';
+  const tools = head.querySelector('.line1 .stat:last-child');
+  const tg = document.createElement('button');
+  tg.className = 'btn ghost sm'; tg.type = 'button';
+  tg.textContent = d.list ? '問題にもどる' : '一覧で見る';
+  tg.onclick = () => { d.list = !d.list; render(); };
+  tools.appendChild(tg);
+  const rs = document.createElement('button');
+  rs.className = 'btn ghost sm'; rs.type = 'button'; rs.textContent = 'はじめから';
+  rs.onclick = () => { ids(key).forEach(id => delete store.res[id]); save(); startDeck(key); render(); };
+  tools.appendChild(rs);
+  wrap.appendChild(head);
+
+  wrap.appendChild(d.list ? listView(key) : cardView(key));
+  return wrap;
+}
+
+function listView(key){
+  const box = document.createElement('div');
+  box.className = 'card';
+  const list = document.createElement('div');
+  list.className = 'list';
+  for (const it of DECKS[key].items){
+    const row = document.createElement('div');
+    row.className = 'li';
+    let q, a;
+    if (key === 'yomi'){ q = it.k; a = '<em>' + esc(it.a) + '</em>　' + esc(it.nt); }
+    else if (key === 'work'){ q = it.head; a = '<em>' + esc(it.type === 'c' ? KANA[it.an] + '　' + it.ch[it.an] : it.a) + '</em>'; }
+    else if (key === 'shiji'){ q = (it.line.match(/\{([^}]*)\}/)||[])[1] || '？'; a = '<em>' + esc(it.ch[it.an]) + '</em>'; }
+    else { q = '問'; a = esc(it.ask) + '　<em>' + esc(it.ch[it.an]) + '</em>'; }
+    row.innerHTML = '<span class="q">' + esc(q) + '</span><span class="a">' + a + '</span>';
+    list.appendChild(row);
+  }
+  box.appendChild(list);
+  return box;
+}
+
+function cardView(key){
+  const d = run[key];
+  if (d.i >= d.q.length) return doneView(key);
+  const it = DECKS[key].items.find(x => x.id === d.q[d.i]);
+  const box = document.createElement('div');
+  box.className = 'card';
+
+  // 見出し
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  let tags = '';
+  if (key === 'yomi')  tags = '<span class="badge shu">' + it.no + '</span><span>プリント' + it.sh + '</span>';
+  if (key === 'shiji') tags = it.star ? '<span class="badge dai">オレンジの丸</span>' : '<span class="badge">指示語</span>';
+  if (key === 'work')  tags = '<span class="badge">' + esc(it.tag) + '</span>' + (it.sub ? '<span>' + esc(it.sub) + '</span>' : '');
+  if (key === 'seki')  tags = '<span class="badge">座席</span>';
+  meta.innerHTML = tags + '<span style="margin-inline-start:auto">' + (d.i+1) + ' / ' + d.q.length + '</span>';
+  box.appendChild(meta);
+
+  // 問題文
+  const stem = document.createElement('div');
+  if (key === 'yomi'){
+    stem.innerHTML = '<div class="big">' + esc(it.k) + '</div>' +
+      '<div class="kanbun" style="text-align:center;font-size:15px;color:var(--ink2)">' + mark(it.line) + '</div>';
+  } else if (key === 'shiji'){
+    stem.innerHTML = '<div class="kanbun">' + mark(it.line, 'ring') + '</div>';
+  } else if (key === 'work'){
+    stem.innerHTML = it.big
+      ? '<div class="kanbun" style="text-align:center">' + esc(it.head) + '</div>'
+      : '<div class="big">' + esc(it.head) + '</div>';
+  }
+  if (stem.innerHTML) box.appendChild(stem);
+
+  const ask = document.createElement('p');
+  ask.className = 'ask';
+  ask.textContent = key === 'yomi' ? 'この語の読みは？' : it.ask;
+  box.appendChild(ask);
+
+  const isText = (key === 'yomi') || (key === 'work' && it.type === 't');
+  const answered = d.state !== 'q';
+
+  if (isText){
+    const row = document.createElement('div');
+    row.className = 'row';
+    const inp = document.createElement('input');
+    inp.className = 'ans-in'; inp.type = 'text'; inp.id = 'in-' + it.id;
+    inp.placeholder = 'ひらがなで入力'; inp.autocomplete = 'off';
+    inp.setAttribute('autocapitalize','off'); inp.setAttribute('spellcheck','false');
+    inp.disabled = answered;
+    if (answered) inp.value = d.typed || '';
+    row.appendChild(inp);
+    if (!answered){
+      const ck = document.createElement('button');
+      ck.className = 'btn'; ck.type = 'button'; ck.textContent = '答え合わせ';
+      ck.onclick = () => {
+        d.typed = inp.value;
+        const ok = judge(inp.value, it);
+        store.res[it.id] = ok ? 1 : 0; save();
+        d.state = ok ? 'ok' : 'ng'; render();
+      };
+      row.appendChild(ck);
+      const sk = document.createElement('button');
+      sk.className = 'btn ghost'; sk.type = 'button'; sk.textContent = 'わからない';
+      sk.onclick = () => { d.typed = inp.value; store.res[it.id] = 0; save(); d.state = 'ng'; render(); };
+      row.appendChild(sk);
+      inp.onkeydown = e => { if (e.key === 'Enter') ck.click(); };
+      setTimeout(() => inp.focus(), 30);
+    }
+    box.appendChild(row);
+  } else {
+    const chs = document.createElement('div');
+    chs.className = 'choices';
+    it.ch.forEach((c, i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'ch';
+      b.innerHTML = '<span class="k">' + KANA[i] + '</span><span>' + esc(c) + '</span>';
+      if (answered){
+        b.disabled = true;
+        if (i === it.an) b.classList.add('right');
+        else if (i === d.picked) b.classList.add('wrong');
+      } else {
+        b.onclick = () => {
+          d.picked = i;
+          const ok = i === it.an;
+          store.res[it.id] = ok ? 1 : 0; save();
+          d.state = ok ? 'ok' : 'ng'; render();
+        };
+      }
+      chs.appendChild(b);
+    });
+    box.appendChild(chs);
+  }
+
+  // 解説
+  if (answered){
+    const fb = document.createElement('div');
+    fb.className = 'fb ' + (d.state === 'ok' ? 'ok' : 'ng');
+    let html = '<div class="head">' + (d.state === 'ok' ? '◯　正解' : '✗　答え') + '</div>';
+    if (isText) html += '<div class="sol">' + esc(it.a) + '</div>';
+    else if (d.state === 'ng') html += '<div class="sol">' + KANA[it.an] + '　' + esc(it.ch[it.an]) + '</div>';
+    if (it.ku) html += '<div class="kud">' + esc(it.ku) + '</div>';
+    if (it.nt) html += '<div class="note">' + esc(it.nt) + '</div>';
+    fb.innerHTML = html;
+    box.appendChild(fb);
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    const nx = document.createElement('button');
+    nx.className = 'btn'; nx.type = 'button';
+    nx.textContent = d.i + 1 >= d.q.length ? '結果を見る' : '次へ';
+    nx.onclick = () => { d.i++; d.state = 'q'; d.picked = -1; d.typed = ''; render(); };
+    row.appendChild(nx);
+    if (d.state === 'ng' && isText){
+      const sm = document.createElement('button');
+      sm.className = 'btn ghost'; sm.type = 'button'; sm.textContent = '合っていた（正解にする）';
+      sm.onclick = () => { store.res[it.id] = 1; save(); d.state = 'ok'; render(); };
+      row.appendChild(sm);
+    }
+    box.appendChild(row);
+    setTimeout(() => nx.focus(), 30);
+  }
+  return box;
+}
+
+function doneView(key){
+  const all = run[key].q;
+  const wrong = all.filter(id => store.res[id] !== 1);
+  const box = document.createElement('div');
+  box.className = 'card done';
+  box.innerHTML = '<div class="lbl">この回の結果</div>' +
+    '<div class="sc">' + (all.length - wrong.length) + '<small> / ' + all.length + '</small></div>' +
+    '<p class="lead">' + (wrong.length ? 'まちがえた ' + wrong.length + ' 問をもう一度やると覚えられる。' : '全問正解。プリントを見ないで言えるか、もう一周してみる。') + '</p>';
+  const row = document.createElement('div');
+  row.className = 'row';
+  if (wrong.length){
+    const w = document.createElement('button');
+    w.className = 'btn'; w.type = 'button'; w.textContent = 'まちがえた問題だけ';
+    w.onclick = () => { startDeck(key, wrong); render(); };
+    row.appendChild(w);
+  }
+  const a = document.createElement('button');
+  a.className = 'btn' + (wrong.length ? ' ghost' : ''); a.type = 'button'; a.textContent = 'ぜんぶもう一度';
+  a.onclick = () => { startDeck(key); render(); };
+  row.appendChild(a);
+  box.appendChild(row);
+  return box;
+}
+
+/* ── 座席を置く ── */
+const ORDER = ['n','w','e','s','o'];
+let place = {slots:{n:[],w:[],e:[],s:[],o:[]}, sel:null, checked:false};
+function placed(){ return ORDER.reduce((a,k) => a.concat(place.slots[k]), []); }
+function resetPlace(){ place = {slots:{n:[],w:[],e:[],s:[],o:[]}, sel:null, checked:false}; }
+function putSel(k){
+  if (!place.sel) return;
+  ORDER.forEach(o => { place.slots[o] = place.slots[o].filter(x => x !== place.sel); });
+  place.slots[k].push(place.sel); place.sel = null; render();
+}
+
+function chipEl(name, opts){
+  const p = PEOPLE.find(x => x.n === name) || {side:'kou', s:''};
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'chip ' + p.side + (place.sel === name && !opts.inSlot ? ' sel' : '');
+  b.innerHTML = esc(name) + (opts.small && p.s ? '<small>' + esc(p.s) + '</small>' : '');
+  b.onclick = e => { e.stopPropagation(); opts.onClick(); };
+  return b;
+}
+
+function placeCard(){
+  const box = document.createElement('div');
+  box.className = 'card';
+  box.innerHTML = '<div class="meta"><span class="badge dai">座席図</span><span>4枚目のプリント</span>' +
+    '<span style="margin-inline-start:auto">' + placed().length + ' / 6 人</span></div>' +
+    '<p class="ask">6人を、すわっている場所（東西南北）に置く。</p>';
+
+  const cmp = document.createElement('div');
+  cmp.className = 'compass';
+  const mid = document.createElement('div');
+  mid.className = 'mid';
+  mid.innerHTML = '<span>鴻門の宴</span><span style="font-size:10px;letter-spacing:.02em;line-height:1.5">「◯嚮」＝◯を向く<br>＝反対がわにすわる</span>';
+
+  for (const k of ['n','w','e','s']){
+    const S = SEATS[k];
+    const sl = document.createElement('div');
+    sl.className = 'slot ' + k;
+    let cls = '';
+    if (place.checked) cls = sameSet(place.slots[k], S.who) ? ' right' : ' wrong';
+    else if (place.sel) cls = ' act';
+    sl.className = 'slot ' + k + cls;
+    const dir = document.createElement('div');
+    dir.className = 'dir'; dir.textContent = S.dir;
+    sl.appendChild(dir);
+    place.slots[k].forEach(n => sl.appendChild(chipEl(n, {inSlot:1, onClick:() => {
+      if (place.checked) return;
+      if (place.sel) return putSel(k);
+      place.slots[k] = place.slots[k].filter(x => x !== n); render();
+    }})));
+    const h = document.createElement('div');
+    h.className = 'hint';
+    h.innerHTML = place.checked ? esc(S.label) : '';
+    sl.appendChild(h);
+    sl.onclick = () => { if (!place.checked) putSel(k); };
+    cmp.appendChild(sl);
+  }
+  cmp.appendChild(mid);
+  box.appendChild(cmp);
+
+  // 席なし
+  const S = SEATS.o;
+  const out = document.createElement('div');
+  let ocls = '';
+  if (place.checked) ocls = sameSet(place.slots.o, S.who) ? ' right' : ' wrong';
+  else if (place.sel) ocls = ' act';
+  out.className = 'out' + ocls;
+  const od = document.createElement('div');
+  od.className = 'dir'; od.textContent = '席についていない';
+  out.appendChild(od);
+  place.slots.o.forEach(n => out.appendChild(chipEl(n, {inSlot:1, onClick:() => {
+    if (place.checked) return;
+    if (place.sel) return putSel('o');
+    place.slots.o = place.slots.o.filter(x => x !== n); render();
+  }})));
+  if (place.checked){
+    const h = document.createElement('span');
+    h.className = 'hint'; h.textContent = S.label;
+    out.appendChild(h);
+  }
+  out.onclick = () => { if (!place.checked) putSel('o'); };
+  box.appendChild(out);
+
+  // 手もち
+  const rest = PEOPLE.map(p => p.n).filter(n => placed().indexOf(n) < 0);
+  const pool = document.createElement('div');
+  pool.className = 'pool';
+  if (!rest.length && !place.checked){
+    const s = document.createElement('span');
+    s.className = 'hint'; s.style.alignSelf = 'center';
+    s.textContent = '6人おけた。「答え合わせ」を押す。';
+    pool.appendChild(s);
+  }
+  rest.forEach(n => pool.appendChild(chipEl(n, {small:1, onClick:() => {
+    if (place.checked) return;
+    place.sel = place.sel === n ? null : n; render();
+  }})));
+  if (rest.length || !place.checked) box.appendChild(pool);
+
+  const lg = document.createElement('div');
+  lg.className = 'legend';
+  lg.innerHTML = '<span><i style="background:var(--ai)"></i>項羽がわ</span>' +
+                 '<span><i style="background:var(--shu)"></i>沛公がわ</span>' +
+                 '<span>人を選んでから、置く場所を押す</span>';
+  box.appendChild(lg);
+
+  const row = document.createElement('div');
+  row.className = 'row';
+  if (!place.checked){
+    const ck = document.createElement('button');
+    ck.className = 'btn'; ck.type = 'button'; ck.textContent = '答え合わせ';
+    ck.disabled = placed().length < 6;
+    ck.onclick = () => { place.checked = true; place.sel = null; render(); };
+    row.appendChild(ck);
+    const sh = document.createElement('button');
+    sh.className = 'btn ghost'; sh.type = 'button'; sh.textContent = '答えを見る';
+    sh.onclick = () => {
+      ORDER.forEach(k => { place.slots[k] = SEATS[k].who.slice(); });
+      place.checked = true; place.sel = null; render();
+    };
+    row.appendChild(sh);
+  }
+  const rs = document.createElement('button');
+  rs.className = 'btn' + (place.checked ? '' : ' ghost'); rs.type = 'button';
+  rs.textContent = place.checked ? 'もう一度おく' : 'やり直す';
+  rs.onclick = () => { resetPlace(); render(); };
+  row.appendChild(rs);
+  box.appendChild(row);
+
+  if (place.checked){
+    const info = document.createElement('div');
+    info.className = 'info';
+    info.innerHTML = ORDER.map(k => '<div><b>' + SEATS[k].dir + '　' + SEATS[k].who.join('・') +
+      '</b>（' + SEATS[k].label + '）　' + SEATS[k].note + '</div>').join('') +
+      '<div style="margin-top:8px"><b>上座の順</b>　東嚮（項王・項伯）＞南嚮（亜父）＞北嚮（沛公）＞西嚮（張良）。' +
+      '客であるはずの沛公が下座で、項王が沛公を見下していることがわかる。</div>';
+    box.appendChild(info);
+  }
+  return box;
+}
+function sameSet(a, b){
+  return a.length === b.length && a.slice().sort().join() === b.slice().sort().join();
+}
+
+/* ── 本文 ── */
+let tate = true;
+function renderText(){
+  const src = document.createElement('div');
+  src.className = 'card';
+  src.innerHTML =
+    '<div class="meta"><span class="badge">出典</span></div>' +
+    '<div class="kanbun" style="font-size:22px;font-weight:800">史記</div>' +
+    '<div class="info" style="border-left-color:var(--ai)">' +
+      '<div><b>ジャンル</b>　歴史書</div>' +
+      '<div><b>成立年</b>　前漢</div>' +
+      '<div><b>編者</b>　司馬遷（歴史家）</div>' +
+      '<div><b>内容</b>　上古から前漢（武帝）に至る、およそ二千数百年にわたる通史。</div>' +
+      '<div style="margin-top:6px">本紀（十二巻／歴代王朝の編年史）・年表（十巻）・書（八巻／文化史）・' +
+      '世家（三十巻／列国史）・列伝（七十巻／個人の伝記集）</div>' +
+    '</div>';
+  main.appendChild(src);
+
+  const bar = document.createElement('div');
+  bar.className = 'row'; bar.style.margin = '18px 0 0';
+  const tg = document.createElement('button');
+  tg.className = 'btn ghost sm'; tg.type = 'button';
+  tg.textContent = tate ? '横書きにする' : '縦書きにする';
+  tg.onclick = () => { tate = !tate; render(); };
+  bar.appendChild(tg);
+  main.appendChild(bar);
+
+  for (const p of TEXT){
+    const h = document.createElement('h2');
+    h.className = 'sec'; h.textContent = p.t;
+    main.appendChild(h);
+    const box = document.createElement('div');
+    box.className = 'card passage';
+    box.innerHTML =
+      '<div class="meta"><span class="badge">' + esc(p.pr) + '</span><span>白文</span></div>' +
+      '<div class="hakubun' + (tate ? ' tate' : '') + '"' +
+        (tate ? '' : ' style="font-family:var(--mincho);font-size:18px;line-height:2.1;letter-spacing:.1em"') +
+        '>' + esc(p.h) + '</div>' +
+      '<div class="lbl" style="margin-top:6px">書き下し文</div>' +
+      '<div class="kudashi">' + esc(p.k) + '</div>' +
+      '<div class="lbl" style="margin-top:6px">現代語訳</div>' +
+      '<div class="yaku">' + esc(p.y) + '</div>';
+    main.appendChild(box);
+  }
+}
+
+/* ── テーマ ── */
+const THEMES = [['auto','自動'],['light','明'],['dark','暗']];
+function applyTheme(){
+  const t = store.theme || 'auto';
+  if (t === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = t;
+  $('#theme').textContent = '表示：' + (THEMES.find(x => x[0] === t) || THEMES[0])[1];
+}
+$('#theme').onclick = () => {
+  const i = THEMES.findIndex(x => x[0] === (store.theme || 'auto'));
+  store.theme = THEMES[(i + 1) % THEMES.length][0];
+  save(); applyTheme();
+};
+
+applyTheme();
+render();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+</script>
 </body>
 </html>

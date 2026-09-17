@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。">
+<meta name="app-version" content="20260917-1034">
 <meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15120E" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -1151,8 +1152,37 @@ if (pwa){
 </script>
 <script>
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function () {});
+  });
 }
 </script>
+<script>
+// 新しい版が出ていたら、開き直したときに自動で読み込み直す
+(function () {
+  var meta = document.querySelector('meta[name="app-version"]');
+  var cur = meta ? meta.content : '';
+  var busy = false;
+  function check() {
+    if (busy || document.hidden || navigator.onLine === false) return;
+    busy = true;
+    fetch('./version.txt?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : null; })
+      .then(function (t) {
+        var v = t && t.trim();
+        if (!v || v === cur) { busy = false; return; }
+        var tried = '';
+        try { tried = sessionStorage.getItem('komon-upd') || ''; } catch (e) {}
+        if (tried === v) { busy = false; return; }          // 一度だけ。繰り返さない
+        try { sessionStorage.setItem('komon-upd', v); } catch (e) {}
+        location.replace(location.pathname + '?v=' + encodeURIComponent(v) + location.hash);
+      })
+      .catch(function () { busy = false; });
+  }
+  window.addEventListener('pageshow', check);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+})();
+</script>
+
 </body>
 </html>

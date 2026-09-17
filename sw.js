@@ -1,5 +1,5 @@
 // sw.js — 鴻門之会ドリル（オフライン対応）
-const CACHE = 'komon-v2';
+const CACHE = 'komon-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+
+  // 版の確認は必ずネットワークへ（キャッシュに残さない）
+  if (new URL(req.url).pathname.endsWith('/version.txt')) return;
 
   e.respondWith(
     fetch(req)

@@ -4,8 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。">
-<meta name="theme-color" content="#F4EFE4">
+<meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15120E" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="鴻門之会">
+<meta name="application-name" content="鴻門之会">
 <title>鴻門之会 ドリル</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,6 +77,14 @@ nav::-webkit-scrollbar{display:none}
 .tab .n{font-size:10px;color:var(--ink3);margin-inline-start:4px;font-variant-numeric:tabular-nums}
 .tab[aria-selected="true"] .n{color:color-mix(in srgb,var(--paper) 70%,transparent)}
 
+#install{border-color:var(--dai);color:var(--dai)}
+#ios-hint{max-width:780px;margin:12px auto 0;padding:11px 14px;
+  display:flex;align-items:center;gap:12px;font-size:12.5px;line-height:1.7;color:var(--ink2);
+  background:var(--dai-soft);border:1px solid var(--dai);border-radius:5px}
+#ios-hint b{color:var(--dai)}
+#ios-x{flex:none;background:none;border:1px solid var(--rule2);border-radius:999px;
+  padding:3px 10px;font-size:11.5px;color:var(--ink2)}
+@media (max-width:460px){#ios-hint{margin-inline:16px}}
 main{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 72px}
 
 /* ── 共通パーツ ── */
@@ -226,10 +243,15 @@ h2.sec:first-of-type{margin-top:4px}
 <header>
   <div class="hd">
     <span class="brand">鴻門之会<span class="sub">史記・司馬遷</span></span>
+    <button class="themebtn" id="install" hidden>＋ ホーム画面に追加</button>
     <button class="themebtn" id="theme">表示</button>
   </div>
   <nav role="tablist" id="nav"></nav>
 </header>
+<div id="ios-hint" hidden>
+  <span>ホーム画面に追加すると、アプリとして開けてオフラインでも使えます。共有ボタン<b>［↑］</b>→「ホーム画面に追加」</span>
+  <button id="ios-x" type="button">閉じる</button>
+</div>
 <main id="main"></main>
 <script>
 "use strict";
@@ -703,7 +725,11 @@ function renderNav(){
     b.setAttribute('aria-selected', String(key === tab));
     if (!DECKS[key]) b.textContent = label;
     else { const s = score(key); b.innerHTML = esc(label) + '<span class="n">' + s.ok + '/' + s.n + '</span>'; }
-    b.onclick = () => { tab = key; render(); window.scrollTo(0,0); };
+    b.onclick = () => {
+      tab = key;
+      try { history.replaceState(null, '', '#' + key); } catch(e){}
+      render(); window.scrollTo(0,0);
+    };
     nav.appendChild(b);
   }
 }
@@ -1181,7 +1207,51 @@ $('#theme').onclick = () => {
 };
 
 applyTheme();
+
+// #yomi などで直接そのタブを開く
+const h0 = (location.hash || '').replace('#','');
+if (TABS.some(t => t[0] === h0)) tab = h0;
+
 render();
+
+// 開いたまま #seki などに切り替わったときも追従する
+window.addEventListener('hashchange', () => {
+  const h = (location.hash || '').replace('#','');
+  if (TABS.some(t => t[0] === h) && h !== tab){ tab = h; render(); window.scrollTo(0,0); }
+});
+
+/* ── ホーム画面への追加（PWA） ── */
+const pwa = !!document.querySelector('link[rel="manifest"]');
+const installBtn = $('#install');
+let deferred = null;
+if (pwa){
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault(); deferred = e; installBtn.hidden = false;
+  });
+  installBtn.onclick = async () => {
+    if (!deferred) return;
+    installBtn.hidden = true;
+    deferred.prompt();
+    await deferred.userChoice;
+    deferred = null;
+  };
+  window.addEventListener('appinstalled', () => { installBtn.hidden = true; deferred = null; });
+
+  // iOS はこのイベントが無いので、やり方を案内する
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('komon-hint') === '1'; } catch(e){}
+  if (ios && !standalone && !dismissed){
+    const hint = $('#ios-hint');
+    hint.hidden = false;
+    $('#ios-x').onclick = () => {
+      hint.hidden = true;
+      try { localStorage.setItem('komon-hint','1'); } catch(e){}
+    };
+  }
+}
 </script>
 <script>
 if ('serviceWorker' in navigator) {

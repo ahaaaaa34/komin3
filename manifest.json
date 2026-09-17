@@ -1,12 +1,27 @@
 {
+  "id": "/komin3/",
   "name": "鴻門之会 ドリル",
   "short_name": "鴻門之会",
-  "description": "史記「鴻門之会」の読み・指示語・ワーク・座席の練習",
+  "description": "史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。",
+  "lang": "ja",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
   "background_color": "#F4EFE4",
   "theme_color": "#F4EFE4",
-  "lang": "ja",
-  "icons": []
+  "categories": ["education"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "読み", "short_name": "読み", "url": "./#yomi", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] },
+    { "name": "指示語", "short_name": "指示語", "url": "./#shiji", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] },
+    { "name": "座席", "short_name": "座席", "url": "./#seki", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] },
+    { "name": "本文", "short_name": "本文", "url": "./#text", "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }] }
+  ]
 }

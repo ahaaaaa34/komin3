@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。">
-<meta name="app-version" content="20260917-1206">
+<meta name="app-version" content="20260917-1224">
 <meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15120E" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -176,6 +176,17 @@ mark.shu{background:var(--shu-soft);color:inherit;border-bottom:4px solid var(--
   border-radius:4px;padding:9px 11px}
 .tip::before{content:'コツ　';font-size:10.5px;letter-spacing:.14em;color:var(--dai);
   font-weight:700;font-family:var(--gothic)}
+.hname{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.hname .n{font-family:var(--mincho);font-size:26px;font-weight:800;letter-spacing:.08em}
+.hname .y{font-size:12px;color:var(--ink3);letter-spacing:.1em}
+.hname .sd{margin-inline-start:auto;font-size:11px;letter-spacing:.08em;
+  border:1px solid currentColor;border-radius:999px;padding:1px 9px}
+.hname .sd.kou{color:var(--ai)}
+.hname .sd.hai{color:var(--shu)}
+.halt{font-size:13.5px;color:var(--ink);line-height:1.75;font-weight:700}
+.hseat{font-size:12.5px;color:var(--ink2);letter-spacing:.03em;
+  background:var(--surface2);border-radius:4px;padding:7px 11px}
+.hseat b{font-size:10.5px;letter-spacing:.14em;color:var(--ink3);margin-inline-end:8px}
 .story{display:flex;flex-direction:column;gap:9px}
 .story div{font-size:13.5px;line-height:1.9;color:var(--ink2);padding-inline-start:15px;position:relative}
 .story div::before{content:'';position:absolute;inset-inline-start:0;top:.75em;
@@ -441,6 +452,62 @@ const SEKI = [
   tip:'ここから「項荘剣を舞わす、意は沛公に在り」という故事成語が生まれた。'}
 ];
 
+// 登場人物
+const HITO = [
+ {n:'項王', y:'こうおう', side:'kou', alt:'項羽（こうう）。名は籍、字は羽。この話の主役。',
+  seat:'西にすわり東を向く（最上座）',
+  b:['楚の名門・項氏の生まれ。祖父の項燕は楚の将軍で、秦に滅ぼされた。その一族が秦への反乱軍を率いた。',
+     '身の丈は八尺（約一八〇センチ以上）、力は重い鼎を持ち上げるほどと書かれる猛将。二十代で四十万の大軍を動かしていた。',
+     '強いが、情に流されて決断が遅れる人。この場面でも范増の合図を三度とも無視し、沛公を討つ機会を逃す。范増に「人と為り忍びず（むごいことができない）」と評される。',
+     'このあと劉邦と天下を争い（楚漢戦争）、垓下の戦いで敗れて自害。三十一歳だった。「四面楚歌」はそのときの話。']},
+
+ {n:'沛公', y:'はいこう', side:'hai', alt:'劉邦（りゅうほう）。のちの漢の初代皇帝・高祖。',
+  seat:'南にすわり北を向く（三番目の席）',
+  b:['農民の子で、もとは沛（地名）の亭長という宿場の下級役人。家柄も学問も武力も項羽に遠く及ばない。',
+     '取り柄は、人の言うことをよく聞き、すぐれた部下を使いこなせること。張良・蕭何・韓信ら（漢の三傑）が支えた。',
+     'この場面では兵十万に対し項羽は四十万。勝てないと見るや、自分から謝りに出向き、手柄を「思いがけない偶然でした」と小さく見せて頭を下げ続ける。',
+     '生き延びたのち項羽を破り、漢を建てる。この宴席から逃げきったことが、その後の歴史を決めた。']},
+
+ {n:'項伯', y:'こうはく', side:'kou', alt:'項羽の叔父（父の弟）。名は纏（てん）。',
+  seat:'西にすわり東を向く（項王と同じ最上座）',
+  b:['若いころ人を殺して追われていたところを、張良にかくまわれて命を助けられた。',
+     '項羽が「翌朝、沛公を攻める」と決めたその夜、恩人の張良だけは逃がそうと、こっそり沛公の陣へ知らせに行く。これが鴻門の会そのものの引き金になった。',
+     '沛公とその場で親戚になる約束まで交わし、項羽をなだめて攻撃を思いとどまらせた。',
+     '宴席では、項荘が剣舞で沛公を斬ろうとすると自分も立って舞い、身体で沛公をかばい続けた。身内でありながら、恩義のために敵方を助けた人物。']},
+
+ {n:'亜父', y:'あほ', side:'kou', alt:'范増（はんぞう）。項羽の参謀。',
+  seat:'北にすわり南を向く（二番目の席）',
+  b:['七十歳を過ぎてから項羽の陣営に加わった老人。項羽は「父に次いで敬う人」という意味で「亜父」と呼んだ。',
+     '「劉邦は天下を狙う器だ、今のうちに殺せ」と早くから見抜いていた、ただ一人の人物。',
+     'この宴席では目くばせを繰り返し、玉玦（一か所が欠けた輪の玉）を三度も挙げて「決断せよ」と迫る。「玦」と「決」が同じ音だから合図になる。',
+     '応じない項羽に見切りをつけ、自分で項荘を呼びに立つ。のちに劉邦側の離間の計で項羽に疑われ、怒って故郷へ帰る途中に病死した。']},
+
+ {n:'項荘', y:'こうそう', side:'kou', alt:'項羽の一族（従弟といわれる）。',
+  seat:'席にはつかない（范増に呼び出される）',
+  b:['范増に呼ばれ、「祝いの酒をすすめ、剣舞を願い出て、その流れで沛公を斬れ」と命じられる。',
+     '実際に剣を抜いて舞いはじめるが、項伯がいっしょに舞って割って入ったため、斬りかかれなかった。',
+     'ここから「項荘剣を舞わす、意は沛公に在り」（表向きの行動の裏に本当のねらいがある）という言葉が生まれた。']},
+
+ {n:'張良', y:'ちょうりょう', side:'hai', alt:'字は子房（しぼう）。沛公の参謀。',
+  seat:'東にすわり西を向く（「坐」ではなく「侍」＝控える）',
+  b:['もとは韓という国の名家の出。秦に祖国を滅ぼされた恨みから、若いころ始皇帝の暗殺を企てて失敗している。',
+     '兵法にすぐれ、劉邦の作戦を支えた。のちに漢の三傑の一人に数えられる。',
+     'この場面では、項伯から危険を知らされて沛公に取り次ぎ、宴席では末席に控える。危なくなると外にいた樊噲を呼び入れた。',
+     '沛公が先に逃げたあとも一人残り、項羽に白璧、范増に玉斗を献じる役を最後までやりきった。']},
+
+ {n:'曹無傷', y:'そうむしょう', side:'hai', alt:'沛公の部下。左司馬（軍の役職）。', sub:1,
+  seat:'この場にはいない',
+  b:['「沛公は関中の王になろうとしている」と項羽に密告し、この事件の発端を作った人物。',
+     '項王が「これは曹無傷が言ったのだ」とうっかり名前を明かしてしまう。',
+     '沛公は自陣に戻るなり、ただちに曹無傷を処刑した。']},
+
+ {n:'樊噲', y:'はんかい', side:'hai', alt:'沛公の家来。沛公の妻の妹の夫。', sub:1,
+  seat:'外で待っている（このあと乱入する）',
+  b:['もとは犬の肉を売っていた男で、根っからの武人。',
+     '張良に呼ばれて宴席に乱入し、項羽をにらんで「懐王の約束を守った沛公を殺すのか」と正面から責めた。',
+     'その勢いに項羽は答えられず、沛公が逃げ出す時間が生まれた。']}
+];
+
 // 句法まとめ
 const BUNPOU = [
  {t:'返り点', f:'レ点＝すぐ上の一字へ返る　／　一二点＝二字以上へだてて上へ返る　／　上中下点＝一二点のまとまりをまたいでさらに上へ返る',
@@ -567,7 +634,7 @@ const DECKS = {
   seki:{name:'座席',   items:SEKI,  kind:'choice',
         lead:'東西南北にだれがいるか。全部で<b>6人</b>。'}
 };
-const TABS = [['yomi','読み'],['shiji','指示語'],['work','ワーク'],['seki','座席'],['bunpou','句法'],['text','本文']];
+const TABS = [['yomi','読み'],['shiji','指示語'],['work','ワーク'],['seki','座席'],['hito','人物'],['bunpou','句法'],['text','本文']];
 const run = {};   // デッキごとの進行状況
 for (const key in DECKS) run[key] = {q:null, i:0, state:'q', picked:-1, list:false};
 
@@ -609,6 +676,7 @@ function render(){
   main.innerHTML = '';
   if (tab === 'text') return renderText();
   if (tab === 'bunpou') return renderBunpou();
+  if (tab === 'hito') return renderHito();
   if (tab === 'seki'){ main.appendChild(placeCard()); }
   main.appendChild(deckView(tab));
 }
@@ -969,6 +1037,35 @@ function placeCard(){
 }
 function sameSet(a, b){
   return a.length === b.length && a.slice().sort().join() === b.slice().sort().join();
+}
+
+/* ── 人物 ── */
+function renderHito(){
+  const lead = document.createElement('div');
+  lead.className = 'info';
+  lead.innerHTML = '鴻門の会に出てくる人たち。<b>誰がどちらがわで、なぜそこにいるのか</b>が分かると、' +
+    '座席の順も剣舞の意味もつながって覚えられる。';
+  main.appendChild(lead);
+  let subHeaded = false;
+  for (const p of HITO){
+    if (p.sub && !subHeaded){
+      subHeaded = true;
+      const sh = document.createElement('h2');
+      sh.className = 'sec'; sh.textContent = '席にはいないが、話を動かす二人';
+      main.appendChild(sh);
+    }
+    const box = document.createElement('div');
+    box.className = 'card';
+    box.style.marginTop = '14px';
+    box.innerHTML =
+      '<div class="hname"><span class="n">' + esc(p.n) + '</span>' +
+      '<span class="y">' + esc(p.y) + '</span>' +
+      '<span class="sd ' + p.side + '">' + (p.side === 'kou' ? '項羽がわ' : '沛公がわ') + '</span></div>' +
+      '<div class="halt">' + esc(p.alt) + '</div>' +
+      '<div class="story">' + p.b.map(x => '<div>' + esc(x) + '</div>').join('') + '</div>' +
+      '<div class="hseat"><b>席</b>' + esc(p.seat) + '</div>';
+    main.appendChild(box);
+  }
 }
 
 /* ── 句法まとめ ── */

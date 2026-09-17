@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。">
-<meta name="app-version" content="20260917-1037">
+<meta name="app-version" content="20260917-1047">
 <meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15120E" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -107,6 +107,16 @@ mark.shu{background:var(--shu-soft);color:inherit;border-bottom:4px solid var(--
   background:var(--dai-soft);display:inline-block}
 .blue{color:var(--ai);border-bottom:1.5px solid var(--ai)}
 
+.kunwrap{display:flex;justify-content:center;padding-block:10px}
+.kunten{display:flex;flex-direction:column;align-items:center;
+  font-family:var(--mincho);font-size:clamp(23px,6.6vw,28px);font-weight:500}
+.kline{position:relative;width:5.6em;height:1.62em;
+  display:flex;align-items:center;justify-content:center}
+.kline .kc{line-height:1}
+.kline .oku,.kline .kae{position:absolute;writing-mode:vertical-rl;
+  font-size:.4em;line-height:1.12;letter-spacing:.02em;white-space:nowrap}
+.kline .oku{left:calc(50% + .62em);top:.52em;color:var(--ink2)}
+.kline .kae{right:calc(50% + .62em);top:.88em;color:var(--ink)}
 .row{display:flex;gap:9px;flex-wrap:wrap}
 .btn{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:4px;
   padding:9px 18px;font-size:14px;font-weight:700;letter-spacing:.08em;transition:.14s}
@@ -349,13 +359,16 @@ const WORK = [
 
  {id:'w5', tag:'句法 2', type:'t', head:'若属皆且為所虜。', sub:'（四二・3）', big:1,
   ask:'次の漢文を書き下し文にしなさい。', a:'若が属皆且に虜とする所と為らんとす。',
+  kun:[{c:'若',o:'ガ'},{c:'属'},{c:'皆'},{c:'且',o:'ニ',k:'レ'},{c:'為',o:'ラント',k:'レ'},
+       {c:'所',o:'ト',k:'レ'},{c:'虜',o:'トスル'},{c:'。'}],
   ac:['若が属皆且に虜とする所と為らんとす','なんぢがぞくみなまさにとりことするところとならんとす','汝が属皆且に虜とする所と為らんとす','若が属、皆且に虜とする所と為らんとす'],
   mn:'お前たちは皆、今にも捕虜にされてしまうだろう。',
-  st:['① 若属 ＝「若が属」。若＝なんぢ（お前）、属＝ともがら。合わせて「お前たち」。',
-      '② 皆 ＝ みな。',
-      '③ 且 ＝ 再読文字。「まさニ〜（セ）ントす」と読み、「今にも〜しようとする」。',
-      '④ 為所虜 ＝ 受身の「為A所B」。ここはAが省かれ「虜とする所と為る」＝捕虜にされる。',
-      '⑤ つないで「若が属皆且に虜とする所と為らんとす」。'],
+  st:['① 返り点　且レ 為レ 所レ 虜 と、レ点が三つ続く。虜 → 所 → 為 → 且（再読）の順に読む。',
+      '② 若属 ＝「若が属」。若＝なんぢ（お前）、属＝ともがら。合わせて「お前たち」。',
+      '③ 皆 ＝ みな。',
+      '④ 且 ＝ 再読文字。送り仮名は右に「ニ」。「まさニ〜（セ）ントす」＝今にも〜しようとする。',
+      '⑤ 為ラント・所ト・虜トスル ＝ 受身の「為A所B」。Aが省かれ「虜とする所と為る」＝捕虜にされる。',
+      '⑥ つないで「若が属皆且に虜とする所と為らんとす」。'],
   nt:'直前の「不者」は「しからずんば（そうしなければ）」と読む。范増が項荘を追い込む決めぜりふで、「沛公を今殺さなければ、いずれ自分たちが殺される」という意味。',
   tip:'再読文字と受身が一文に同居する、テストで狙われる形。「且に〜んとす」の「ん」を落とさないこと。'}
 ];
@@ -493,6 +506,14 @@ let store = {res:{}, theme:'auto'};
 try { const r = localStorage.getItem(SAVE); if (r) store = Object.assign(store, JSON.parse(r)); } catch(e){}
 function save(){ try { localStorage.setItem(SAVE, JSON.stringify(store)); } catch(e){} }
 
+function kunten(list){
+  return '<div class="kunwrap"><div class="kunten">' + list.map(c =>
+    '<div class="kline">' +
+    (c.k ? '<span class="kae">' + esc(c.k) + '</span>' : '') +
+    '<span class="kc">' + esc(c.c) + '</span>' +
+    (c.o ? '<span class="oku">' + esc(c.o) + '</span>' : '') +
+    '</div>').join('') + '</div></div>';
+}
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function mark(line, kind){
   return esc(line).replace(/\{([^}]*)\}/g, (m,p) =>
@@ -649,8 +670,8 @@ function cardView(key){
   } else if (key === 'shiji'){
     stem.innerHTML = '<div class="kanbun">' + mark(it.line, 'ring') + '</div>';
   } else if (key === 'work'){
-    stem.innerHTML = it.big
-      ? '<div class="kanbun" style="text-align:center">' + esc(it.head) + '</div>'
+    stem.innerHTML = it.kun ? kunten(it.kun)
+      : it.big ? '<div class="kanbun" style="text-align:center">' + esc(it.head) + '</div>'
       : '<div class="big">' + esc(it.head) + '</div>';
   }
   if (stem.innerHTML) box.appendChild(stem);

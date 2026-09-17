@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="史記「鴻門之会」の読み・指示語・ワーク・座席・句法を、解説つきで練習するドリル。">
-<meta name="app-version" content="20260917-1047">
+<meta name="app-version" content="20260917-1206">
 <meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#15120E" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -117,6 +117,16 @@ mark.shu{background:var(--shu-soft);color:inherit;border-bottom:4px solid var(--
   font-size:.4em;line-height:1.12;letter-spacing:.02em;white-space:nowrap}
 .kline .oku{left:calc(50% + .62em);top:.52em;color:var(--ink2)}
 .kline .kae{right:calc(50% + .62em);top:.88em;color:var(--ink)}
+.kline .num{position:absolute;right:calc(50% + .6em);top:.28em;writing-mode:vertical-rl;
+  font-size:.36em;line-height:1.05;letter-spacing:0;white-space:nowrap;
+  color:var(--shu);font-family:var(--gothic);font-weight:700}
+.kaebox{background:var(--shu-soft);border-radius:4px;padding:11px 13px;
+  display:flex;flex-direction:column;gap:7px}
+.kaebox .pt-t{color:var(--shu)}
+.kaebox div:not(.pt-t){font-size:13px;line-height:1.85;color:var(--ink2);
+  padding-inline-start:14px;position:relative}
+.kaebox div:not(.pt-t)::before{content:'';position:absolute;inset-inline-start:0;top:.75em;
+  width:5px;height:5px;border-radius:50%;background:var(--shu)}
 .row{display:flex;gap:9px;flex-wrap:wrap}
 .btn{background:var(--ink);color:var(--paper);border:1px solid var(--ink);border-radius:4px;
   padding:9px 18px;font-size:14px;font-weight:700;letter-spacing:.08em;transition:.14s}
@@ -359,8 +369,14 @@ const WORK = [
 
  {id:'w5', tag:'句法 2', type:'t', head:'若属皆且為所虜。', sub:'（四二・3）', big:1,
   ask:'次の漢文を書き下し文にしなさい。', a:'若が属皆且に虜とする所と為らんとす。',
-  kun:[{c:'若',o:'ガ'},{c:'属'},{c:'皆'},{c:'且',o:'ニ',k:'レ'},{c:'為',o:'ラント',k:'レ'},
-       {c:'所',o:'ト',k:'レ'},{c:'虜',o:'トスル'},{c:'。'}],
+  kun:[{c:'若',o:'ガ',n:'①'},{c:'属',n:'②'},{c:'皆',n:'③'},{c:'且',o:'ニ',k:'レ',n:'④⑧'},
+       {c:'為',o:'ラント',k:'レ',n:'⑦'},{c:'所',o:'ト',k:'レ',n:'⑥'},{c:'虜',o:'トスル',n:'⑤'},{c:'。'}],
+  kae:{t:'返り点の読み方', b:[
+    'レ点は「すぐ上の一字に返る」印で、漢字の左下につく。下の字を先に読んでから、一字上にもどる。',
+    'この文はレ点が三つ続いている。こういうときは、いちばん下から順に返る。虜 →（所レ虜）所 →（為レ…）為、という順になる。',
+    '且は再読文字。下りるときに「まさニ」と読み、為まで読んだあと、もう一度もどって「〜ントす」と読む。そのための返り点が且の左下についている。',
+    '返り点を無視して上から読むと「若属皆且為所虜」となり、「虜とする所と為らんとす」という語順が作れない。返り点＝読む順の指示、と考える。',
+    '送り仮名は右下にカタカナで書く（ガ・ニ・ラント・ト・トスル）。書き下し文にするときは、これをひらがなに直して本文に混ぜる。']},
   ac:['若が属皆且に虜とする所と為らんとす','なんぢがぞくみなまさにとりことするところとならんとす','汝が属皆且に虜とする所と為らんとす','若が属、皆且に虜とする所と為らんとす'],
   mn:'お前たちは皆、今にも捕虜にされてしまうだろう。',
   st:['① 返り点　且レ 為レ 所レ 虜 と、レ点が三つ続く。虜 → 所 → 為 → 且（再読）の順に読む。',
@@ -427,6 +443,10 @@ const SEKI = [
 
 // 句法まとめ
 const BUNPOU = [
+ {t:'返り点', f:'レ点＝すぐ上の一字へ返る　／　一二点＝二字以上へだてて上へ返る　／　上中下点＝一二点のまとまりをまたいでさらに上へ返る',
+  m:'漢文を日本語の語順で読むための印で、漢字の左下につく。レ点が続くときは、いちばん下から順に返る。一二点は「一」の字まで読んでから「二」の字へもどる。一二点の範囲をまたいでさらに返るときに上中下点、それもまたぐときに甲乙丙点を使う。レ点と一点を兼ねた「一レ点」もある。送り仮名は右下にカタカナで書く。',
+  ex:'若属皆且レ為ラントレ所トレ虜トスル。', exk:'若が属皆且に虜とする所と為らんとす。',
+  exy:'レ点が三つ。虜 → 所 → 為 → 且（再読）の順に読む。ワーク句法2の問題。'},
  {t:'使役', f:'使・令・教・遣 ＋ A ＋ B ＝ AヲシテB（セ）シム',
   m:'AにBさせる。',
   ex:'令将軍与臣有郤。', exk:'将軍と臣とをして郤有らしむ。', exy:'将軍と私とを仲たがいさせている。'},
@@ -506,13 +526,15 @@ let store = {res:{}, theme:'auto'};
 try { const r = localStorage.getItem(SAVE); if (r) store = Object.assign(store, JSON.parse(r)); } catch(e){}
 function save(){ try { localStorage.setItem(SAVE, JSON.stringify(store)); } catch(e){} }
 
-function kunten(list){
-  return '<div class="kunwrap"><div class="kunten">' + list.map(c =>
-    '<div class="kline">' +
-    (c.k ? '<span class="kae">' + esc(c.k) + '</span>' : '') +
-    '<span class="kc">' + esc(c.c) + '</span>' +
-    (c.o ? '<span class="oku">' + esc(c.o) + '</span>' : '') +
-    '</div>').join('') + '</div></div>';
+function kunten(list, mode){
+  return '<div class="kunwrap"><div class="kunten">' + list.map(c => {
+    const left = mode === 'num'
+      ? (c.n ? '<span class="num">' + esc(c.n) + '</span>' : '')
+      : (c.k ? '<span class="kae">' + esc(c.k) + '</span>' : '');
+    return '<div class="kline">' + left +
+      '<span class="kc">' + esc(c.c) + '</span>' +
+      (c.o ? '<span class="oku">' + esc(c.o) + '</span>' : '') + '</div>';
+  }).join('') + '</div></div>';
 }
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function mark(line, kind){
@@ -748,6 +770,11 @@ function cardView(key){
     if (it.mn) html += kv('意味', it.mn);
     if (it.ku) html += kv('書き下し', it.ku, 1);
     if (it.yk) html += kv('訳', it.yk);
+    if (it.kun && it.kae){
+      html += '<div class="lbl" style="margin-top:4px">読む順（①→⑧）</div>' + kunten(it.kun, 'num');
+      html += '<div class="kaebox"><div class="pt-t">' + esc(it.kae.t) + '</div>' +
+        it.kae.b.map(x => '<div>' + esc(x) + '</div>').join('') + '</div>';
+    }
     if (it.st) html += '<div class="steps">' + it.st.map(x => '<div>' + esc(x) + '</div>').join('') + '</div>';
     if (it.pt) html += '<div class="ptbox"><div class="pt-t">句法　' + esc(it.pt.t) + '</div>' +
       '<div class="pt-f">' + esc(it.pt.f) + '</div>' +
